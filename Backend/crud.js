@@ -3,10 +3,7 @@ const app=exp();
 const mysql= require('mysql2');
 const cors= require('cors');
 
-
-
-
-
+//Database Connection 
 const conn =mysql.createConnection({
     host:"localhost",
     user:"root",
@@ -23,7 +20,7 @@ conn.connect((err)=>{
 })
 
 
-//middleware
+//Middleware
 app.use(exp.json());
 
 app.use(cors("*"));
