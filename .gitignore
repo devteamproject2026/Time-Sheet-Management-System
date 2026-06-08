@@ -1,0 +1,19 @@
+# React
+node_modules/
+build/
+dist/
+
+# Environment
+.env
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# IntelliJ
+.idea/
