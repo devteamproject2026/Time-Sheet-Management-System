@@ -19,4 +19,8 @@ Folder Structure
 Frontend: React
 Backend: Spring Boot / Node 
 REDME file updated by Juned;
+<<<<<<< HEAD
 This File Is Edited By vivek.
+=======
+confilct is get Resolved;
+>>>>>>> 8ce5851 (Confilits are resolved)
