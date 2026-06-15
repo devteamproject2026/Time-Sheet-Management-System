@@ -7,7 +7,7 @@ export default function HomeComp(){
 
         <nav className="navbar navbar-expand-lg navbar-light bg-light px-3">
          <div className="container-fluid">
-          <span className="navbar-brand">My App</span>
+          <span className="navbar-brand">TimeX</span>
 
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
@@ -17,8 +17,8 @@ export default function HomeComp(){
             </li>
 
             <li className="nav-item">
-              <NavLink className="nav-link" to="/register">
-                Register
+              <NavLink className="nav-link" to="/hr-register">
+                Hr Register
               </NavLink>
             </li>
            </ul>
