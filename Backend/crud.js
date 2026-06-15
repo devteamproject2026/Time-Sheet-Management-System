@@ -140,7 +140,7 @@ app.get('/pending-hr', (req, res) => {
 
 
 /*-----------------------------------
-            Approve HR.              |
+            Approve HR              |
 -------------------------------------*/
 
 app.put('/approve-hr/:id', (req, res) => {
