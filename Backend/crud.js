@@ -10,9 +10,18 @@ const cors = require('cors');
 const conn = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "ganesh2002",
+    password: "root",
     database: "TimeSheetDB"
 })
+// const conn =mysql.createConnection({
+//     host:"localhost",
+//     user:"root",
+//     password:"root",
+//     password:"root",
+//     database:"CDAC"
+// })
+
+
 conn.connect((err) => {
     if (err) {
         console.log("Error connecting to database" + err);
@@ -187,6 +196,106 @@ app.put('/reject-hr/:id', (req, res) => {
     });
 });
 
+// -------------------------
+//crete manager
+//-------------------------
+app.post('/create-manager', (req, res) => {
+    const { username, password, fname, lname, email, contact } = req.body;
+
+    const sql = `
+        INSERT INTO users
+        (username, password, fname, lname, email, contact, role, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        username,
+        password,
+        fname,
+        lname,
+        email,
+        contact,
+        'MANAGER',
+        'APPROVED'
+    ];
+
+    conn.query(sql, values, (err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Manager Creation Failed");
+        }
+
+        res.status(201).send("Manager Created Successfully");
+    });
+});
+
+
+
+
+//create Employe
+app.post('/create-employee', (req, res) => {
+    const { username, password, fname, lname, email, contact } = req.body;
+
+    const sql = `
+        INSERT INTO users
+        (username, password, fname, lname, email, contact, role, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        username,
+        password,
+        fname,
+        lname,
+        email,
+        contact,
+        'EMPLOYEE',
+        'APPROVED'
+    ];
+
+    conn.query(sql, values, (err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Employee Creation Failed");
+        }
+
+        res.status(201).send("Employee Created Successfully");
+    });
+});
+
+//------------------------------
+ //Create Emp
+//------------------------------
+
+app.post('/create-employee', (req, res) => {
+    const { username, password, fname, lname, email, contact } = req.body;
+
+    const sql = `
+        INSERT INTO users
+        (username, password, fname, lname, email, contact, role, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        username,
+        password,
+        fname,
+        lname,
+        email,
+        contact,
+        'EMPLOYEE',
+        'APPROVED'
+    ];
+
+    conn.query(sql, values, (err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Employee Creation Failed");
+        }
+
+        res.status(201).send("Employee Created Successfully");
+    });
+});
 
 
 
@@ -194,3 +303,7 @@ app.put('/reject-hr/:id', (req, res) => {
 app.listen(9000, () => {
     console.log("Server started at port 9000");
 });
+
+
+
+
