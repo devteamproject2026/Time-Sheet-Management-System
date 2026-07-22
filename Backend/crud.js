@@ -1,95 +1,94 @@
-const exp= require('express');
-const app=exp();
-const mysql= require('mysql2');
-const cors= require('cors');
 
-//Database Connection 
-const conn =mysql.createConnection({
-    host:"localhost",
-    user:"root",
-    password:"ganesh2002",
-    database:"CDAC"
+
+const exp = require('express');
+const app = exp();
+const mysql = require('mysql2');
+const cors = require('cors');
+
+
+
+const conn = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "root",
+    database: "TimeSheetDB"
 })
-conn.connect((err)=>{
-    if(err){
-        console.log("Error connecting to database"+err);
+// const conn =mysql.createConnection({
+//     host:"localhost",
+//     user:"root",
+//     password:"root",
+//     password:"root",
+//     database:"CDAC"
+// })
+
+
+conn.connect((err) => {
+    if (err) {
+        console.log("Error connecting to database" + err);
     }
-    else{
+    else {
         console.log("DataBAse connected Successfully");
     }
 })
 
 
-//Middleware
+//middleware
 app.use(exp.json());
 
 app.use(cors("*"));
 
 
-const checkLogin=(req,res,next)=>{
-    const{username, password}=req.body;
-    if(!username || !password){
+
+const checkLogin = (req, res, next) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
         return res.send("Username or Password doesnt match ")
     }
     next();
 }
 
-app.get('/users', (req, res) => {
-    conn.query("SELECT * FROM users;", (err, result) => {
-        if (!err) {
-            res.json(result);
-        } else {
-            console.error("Database error:", err.message);
-            
+
+
+/*-----------------------------------------
+        Hr Registration                   ||
+ ------------------------------------------- */
+
+app.post('/register-hr', (req, res) => {
+
+    const {
+        username, password, fname, lname, email, contact } = req.body;
+
+    const sql = `
+    INSERT INTO users
+    (username,password,fname,lname, email,contact, role, status
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [username, password, fname, lname, email, contact, 'HR_HEAD', 'PENDING'];
+
+    conn.query(sql, values, (err) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Registration Failed");
         }
+
+        res.status(201).send("HR Registration Request Submitted");
     });
 });
 
-app.get('/users/:id',(req,res)=>{
-    const id=req.params.id;
-    conn.query("select * from users where userid=?",[id],(err,result)=>{
-        if(!err){
-            res.json(result);
-            console.log("Data fetch of id"+id);
-        }
-        else{
-            console.log("Failed to fetch The Data");
-        }
-    });
 
-})
-
-app.post('/register',(req,res)=>{
-    console.log(req.body);
-    const {username,password,fname,mname ,lname,email,contact}= req.body
-    //const userid=req.body;
-    // const username=req.body.us;
-    // const password=req.body;
-    // const fname=req.body;
-    // const mname=req.body;
-    // const lname=req.body;
-    // const email=req.body;
-    // const contact=req.body;
-     const sql="Insert into users (username,password,fname,mname,lname,email,contact) VALUES (?, ?, ?, ?, ?, ?, ?)";
-     const values=[username, password, fname, mname, lname, email, contact];
-
-    conn.query(sql,values,(err)=>{
-        if(!err){
-            console.log("register successfully..");
-            res.send("Data Entered successfully...");
-        }
-        else{
-            console.log("Fariled to register ..")
-            console.log(err.message);
-        }
-    })
-})
+/*-----------------------------------------
+        Hr login                   ||
+ ------------------------------------------- */
 
 app.post('/login', (req, res) => {
 
     const { username, password } = req.body;
 
-    const sql = "SELECT * FROM users WHERE username=? AND password=?";
+    const sql = `SELECT * FROM users WHERE username=? AND password=? AND status='APPROVED'
+`;
     const values = [username, password];
 
     conn.query(sql, values, (err, result) => {
@@ -124,32 +123,179 @@ app.post('/login', (req, res) => {
 });
 
 
+/*--------------------------
+Get All Pending HR Requests |
+----------------------------*/
 
-app.post("/reset", (req, res)=>{
-    const {username, password, new_password}=req.body
-    conn.query("select * from users where username=? and password=?",[username, password], (err, result)=>{
-        if(err){
-            console.log(err);
-            res.send("Error at server side")
-        }else{
-            if(result.length>0){
-                console.log("Login successful");
-                conn.query("update users set password=? where username=?",[new_password, username], (err, data)=>{
-                    if(err){
-                        console.log(err);
-                        res.send("Error at server side")
-                    }else{
-                        res.send("password updated")
-                    }
-                })
-                
-            }else{
-                res.send("Wrong uid or password")
-            }
-            // res.send(result)
+
+app.get('/pending-hr', (req, res) => {
+
+    const sql = `
+    SELECT *
+    FROM users
+    WHERE role='HR_HEAD'
+    AND status='PENDING'
+    `;
+
+    conn.query(sql, (err, result) => {
+
+        if (err) {
+            return res.status(500).send("Database Error");
         }
-    })
-})
+
+        res.json(result);
+    });
+});
+
+
+/*-----------------------------------
+            Approve HR              |
+-------------------------------------*/
+
+app.put('/approve-hr/:id', (req, res) => {
+
+    const id = req.params.id;
+
+    const sql = `
+    UPDATE users
+    SET status='APPROVED'
+    WHERE userid=?
+    `;
+
+    conn.query(sql, [id], (err) => {
+
+        if (err) {
+            return res.status(500).send("Approval Failed");
+        }
+
+        res.send("HR Approved");
+    });
+});
+
+/*-----------------------------------
+           Reject HR             |
+-------------------------------------*/
+
+app.put('/reject-hr/:id', (req, res) => {
+
+    const id = req.params.id;
+
+    const sql = `
+    UPDATE users
+    SET status='REJECTED'
+    WHERE userid=?
+    `;
+
+    conn.query(sql, [id], (err) => {
+
+        if (err) {
+            return res.status(500).send("Rejection Failed");
+        }
+
+        res.send("HR Rejected");
+    });
+});
+
+// -------------------------
+//crete manager
+//-------------------------
+app.post('/create-manager', (req, res) => {
+    const { username, password, fname, lname, email, contact } = req.body;
+
+    const sql = `
+        INSERT INTO users
+        (username, password, fname, lname, email, contact, role, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        username,
+        password,
+        fname,
+        lname,
+        email,
+        contact,
+        'MANAGER',
+        'APPROVED'
+    ];
+
+    conn.query(sql, values, (err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Manager Creation Failed");
+        }
+
+        res.status(201).send("Manager Created Successfully");
+    });
+});
+
+
+
+
+//create Employe
+app.post('/create-employee', (req, res) => {
+    const { username, password, fname, lname, email, contact } = req.body;
+
+    const sql = `
+        INSERT INTO users
+        (username, password, fname, lname, email, contact, role, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        username,
+        password,
+        fname,
+        lname,
+        email,
+        contact,
+        'EMPLOYEE',
+        'APPROVED'
+    ];
+
+    conn.query(sql, values, (err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Employee Creation Failed");
+        }
+
+        res.status(201).send("Employee Created Successfully");
+    });
+});
+
+//------------------------------
+ //Create Emp
+//------------------------------
+
+app.post('/create-employee', (req, res) => {
+    const { username, password, fname, lname, email, contact } = req.body;
+
+    const sql = `
+        INSERT INTO users
+        (username, password, fname, lname, email, contact, role, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        username,
+        password,
+        fname,
+        lname,
+        email,
+        contact,
+        'EMPLOYEE',
+        'APPROVED'
+    ];
+
+    conn.query(sql, values, (err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Employee Creation Failed");
+        }
+
+        res.status(201).send("Employee Created Successfully");
+    });
+});
 
 
 
@@ -157,3 +303,7 @@ app.post("/reset", (req, res)=>{
 app.listen(9000, () => {
     console.log("Server started at port 9000");
 });
+
+
+
+
