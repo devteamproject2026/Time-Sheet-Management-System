@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { login } from "../redux/authslice";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import "./LoginComp.css";
 
 export default function LoginComp() {
   const [username, setUsername] = useState("");
@@ -69,38 +70,67 @@ export default function LoginComp() {
   };
 
   return (
-    <>
-      <h1>Login Component</h1>
+    <main className="login-page">
+      <section className="login-visual" aria-hidden="true">
+        <div className="brand-mark">WP</div>
+        <div>
+          <p className="login-kicker">WorkPulse</p>
+          <h1>Time Sheet Management System</h1>
+          <p>
+            Track work hours, review requests, and keep team activity organized
+            from one role-based workspace.
+          </p>
+        </div>
+      </section>
 
-      <form>
-        <label>UserName:</label>
-        <input
-          type="text"
-          name="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+      <section className="login-panel">
+        <div className="login-card">
+          <NavLink className="back-home-link" to="/">
+            Back to home
+          </NavLink>
 
-        <br />
+          <div className="login-heading">
+            <p>Welcome back</p>
+            <h2>Sign in to your account</h2>
+          </div>
 
-        <label>Password:</label>
-        <input
-          type="password"
-          name="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <form className="login-form" onSubmit={handelSubmit}>
+            <div className="form-field">
+              <label htmlFor="username">Username</label>
+              <input
+                id="username"
+                type="text"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter username"
+                autoComplete="username"
+                required
+              />
+            </div>
 
-        <br />
+            <div className="form-field">
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                autoComplete="current-password"
+                required
+              />
+            </div>
 
-        <input
-          type="submit"
-          value="LOGIN"
-          onClick={handelSubmit}
-        />
-      </form>
+            <button className="login-button" type="submit">
+              Sign in
+            </button>
+          </form>
 
-      <p>{msg}</p>
-    </>
+          {msg && <p className="login-message">{msg}</p>}
+        </div>
+      </section>
+    </main>
   );
 }
