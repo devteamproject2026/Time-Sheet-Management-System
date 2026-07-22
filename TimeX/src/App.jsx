@@ -28,6 +28,17 @@ import ManagerDashboard from "./components/Manager/ManagerDashboard";
 // Employee Pages
 import EmployeeDashboard from "./components/Employee/EmployeeDashboard";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import AdminDashboard from "./components/Admin/AdminDashboard";
+import HrDashboard from "./components/HR-Head/HrDashboard";
+import ManagerDashboard from "./components/Manager/ManagerDashboard";
+import EmployeeDashboard from "./components/Employee/EmployeeDashboard";
+import HrRegistration from "./components/HR-Head/HrRegistration";
+import PendingHrRequests from "./components/Admin/PendingHrRequests";
+import CreateEmployee from "./components/HR-Head/CreateEmployee";
+import CreateManager from "./components/HR-Head/CreateManager";
+
 function App() {
   return (
     <BrowserRouter>
