@@ -7,8 +7,8 @@ export default function HrRegistration() {
     const [formData, setFormData] = useState({
         username: "",
         password: "",
-        fname: "",
-        lname: "",
+        first_name: "",
+        last_name: "",
         email: "",
         contact: ""
     });

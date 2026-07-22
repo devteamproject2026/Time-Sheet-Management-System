@@ -56,16 +56,15 @@ const checkLogin = (req, res, next) => {
 app.post('/register-hr', (req, res) => {
 
     const {
-        username, password, fname, lname, email, contact } = req.body;
+        username, password, first_name, last_name, email, contact, joining_date } = req.body;
 
-    const sql = `
-    INSERT INTO users
-    (username,password,fname,lname, email,contact, role, status
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+const sql = `
+INSERT INTO users
+(username, password, first_name, last_name, email, contact, joining_date, role, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
 
-    const values = [username, password, fname, lname, email, contact, 'HR_HEAD', 'PENDING'];
+    const values = [username, password, first_name, last_name, email, contact, joining_date, 'HR_HEAD', 'PENDING'];
 
     conn.query(sql, values, (err) => {
 
@@ -105,7 +104,7 @@ app.post('/login', (req, res) => {
 
             return res.status(200).json({
                 user: {
-                    userid: result[0].userid,
+                    userid: result[0].user_id,
                     username: result[0].username,
                     role: result[0].role
                 },
@@ -159,7 +158,7 @@ app.put('/approve-hr/:id', (req, res) => {
     const sql = `
     UPDATE users
     SET status='APPROVED'
-    WHERE userid=?
+    WHERE user_id=?
     `;
 
     conn.query(sql, [id], (err) => {
@@ -183,7 +182,7 @@ app.put('/reject-hr/:id', (req, res) => {
     const sql = `
     UPDATE users
     SET status='REJECTED'
-    WHERE userid=?
+    WHERE user_id=?
     `;
 
     conn.query(sql, [id], (err) => {
