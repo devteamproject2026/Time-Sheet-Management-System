@@ -1,0 +1,31 @@
+package com.tms.authservice.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.tms.authservice.entity.User;
+import com.tms.authservice.entity.enums.Role;
+import com.tms.authservice.entity.enums.Status;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Integer> {
+
+    // Find user by username
+    Optional<User> findByUsername(String username);
+
+    // Login
+    Optional<User> findByUsernameAndStatus(String username, Status status);
+
+    // Check duplicate email
+    boolean existsByEmail(String email);
+
+    // Check duplicate username
+    boolean existsByUsername(String username);
+
+    // Pending HR Requests
+    List<User> findByRoleAndStatus(Role role, Status status);
+
+}

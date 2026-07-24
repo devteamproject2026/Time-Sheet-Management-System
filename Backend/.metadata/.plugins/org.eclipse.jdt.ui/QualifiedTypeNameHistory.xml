@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.hibernate.annotations.CreationTimestamp"/>
+    <fullyQualifiedTypeName name="com.tms.authservice.service.AuthService"/>
+    <fullyQualifiedTypeName name="jakarta.validation.constraints.NotBlank"/>
+    <fullyQualifiedTypeName name="java.time.LocalDate"/>
+    <fullyQualifiedTypeName name="com.fasterxml.jackson.annotation.JsonFilter"/>
+    <fullyQualifiedTypeName name="java.util.regex.Pattern"/>
+    <fullyQualifiedTypeName name="com.fasterxml.jackson.annotation.JsonFormat"/>
+    <fullyQualifiedTypeName name="jakarta.validation.constraints.NotNull"/>
+    <fullyQualifiedTypeName name="com.tms.authservice.entity.enums.Role"/>
+    <fullyQualifiedTypeName name="com.tms.authservice.entity.enums.Status"/>
+    <fullyQualifiedTypeName name="com.tms.authservice.entity.enums.ApprovalStatus"/>
+</qualifiedTypeNameHistroy>

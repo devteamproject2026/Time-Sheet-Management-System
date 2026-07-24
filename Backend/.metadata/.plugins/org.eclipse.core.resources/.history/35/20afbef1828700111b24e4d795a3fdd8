@@ -1,0 +1,15 @@
+package com.tms.authservice.entity.enums;
+
+public enum Status {
+
+    PENDING,
+
+    APPROVED,
+
+    REJECTED,
+
+    ACTIVE,
+
+    INACTIVE
+
+}

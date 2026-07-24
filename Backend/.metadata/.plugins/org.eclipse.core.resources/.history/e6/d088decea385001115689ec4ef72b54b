@@ -1,0 +1,5 @@
+package com.tms.authservice.service;
+
+public class AuthService {
+
+}

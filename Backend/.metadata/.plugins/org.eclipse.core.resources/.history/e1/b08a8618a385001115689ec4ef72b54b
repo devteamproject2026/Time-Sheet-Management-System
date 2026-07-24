@@ -1,0 +1,5 @@
+package com.tms.authservice.repository;
+
+public class UserRepository {
+
+}
