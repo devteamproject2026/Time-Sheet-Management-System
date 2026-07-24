@@ -1,0 +1,141 @@
+package com.tms.authservice.service;
+
+import java.util.List;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.tms.authservice.dto.LoginRequest;
+import com.tms.authservice.dto.LoginResponse;
+import com.tms.authservice.dto.RegisterHrRequest;
+import com.tms.authservice.entity.User;
+import com.tms.authservice.entity.enums.Role;
+import com.tms.authservice.entity.enums.Status;
+import com.tms.authservice.repository.UserRepository;
+
+@Service
+public class AuthServiceImpl implements AuthService {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public AuthServiceImpl(UserRepository userRepository,
+                           BCryptPasswordEncoder passwordEncoder) {
+
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    
+    //=============================================
+    //             HR REGISTRATION
+    //=============================================
+    @Override
+    public String registerHr(RegisterHrRequest request) {
+
+        // Check duplicate username
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        // Check duplicate email
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .contact(request.getContact())
+                .joiningDate(request.getJoiningDate())
+                .role(Role.HR_HEAD)
+                .status(Status.PENDING)
+                .build();
+
+        userRepository.save(user);
+
+        return "HR Registration Request Submitted Successfully";
+    }
+
+    
+    //=============================================
+    //        LOGIN
+    //=============================================
+    @Override
+    public LoginResponse login(LoginRequest request) {
+
+        User user = userRepository
+                .findByUsernameAndStatus(
+                        request.getUsername(),
+                        Status.APPROVED)
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid Username or User Not Approved"));
+
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword())) {
+
+            throw new RuntimeException("Invalid Password");
+        }
+
+        return LoginResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .role(user.getRole().name())
+                .token("abc123")
+                .message("Login Successful")
+                .build();
+    }
+
+    
+    //=============================================
+    //        Get All Pending HR
+    //=============================================
+    @Override
+    public List<User> getPendingHrRequests() {
+
+        return userRepository.findByRoleAndStatus(
+                Role.HR_HEAD,
+                Status.PENDING);
+    }
+
+    
+    //=============================================
+    //        Approve Hr
+    //=============================================
+    @Override
+    public String approveHr(Integer userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("HR Not Found"));
+
+        user.setStatus(Status.APPROVED);
+
+        userRepository.save(user);
+
+        return "HR Approved Successfully";
+    }
+
+    
+    //=============================================
+    //        Get Rejected Hr 
+    //=============================================
+    @Override
+    public String rejectHr(Integer userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("HR Not Found"));
+
+        user.setStatus(Status.REJECTED);
+
+        userRepository.save(user);
+
+        return "HR Rejected Successfully";
+    }
+
+}
