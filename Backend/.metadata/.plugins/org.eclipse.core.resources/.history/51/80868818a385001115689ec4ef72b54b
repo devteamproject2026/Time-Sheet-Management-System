@@ -1,5 +1,0 @@
-package com.tms.authservice.entity.enums;
-
-public class Status {
-
-}

@@ -9,12 +9,15 @@ dist/
 # Logs
 *.log
 
-# VS Code
+# IDEs & Editors
 .vscode/
+.idea/
+
+# Eclipse / Spring Tool Suite (STS)
+.metadata/
+**/ .metadata/
+RemoteSystemsTempFiles/
+*.STS_VERSION
 
 # Mac
 .DS_Store
-
-# IntelliJ
-.idea/
-/.metadata/

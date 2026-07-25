@@ -1,5 +1,0 @@
-package com.tms.authservice.controller;
-
-public class AuthController {
-
-}
