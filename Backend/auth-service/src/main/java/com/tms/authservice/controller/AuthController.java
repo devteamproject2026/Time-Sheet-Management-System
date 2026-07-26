@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,7 @@ public class AuthController {
     //==============================================
     // Register Manager
     //==============================================
+    @PreAuthorize("hasRole('HR_HEAD')")
     @PostMapping("/register-manager")
     public ResponseEntity<String> registerManager(
             @Valid @RequestBody RegisterHrRequest request) {
@@ -63,6 +65,7 @@ public class AuthController {
     //==============================================
     // Register Employee
     //==============================================
+    @PreAuthorize("hasRole('HR_HEAD')")
     @PostMapping("/register-employee")
     public ResponseEntity<String> registerEmployee(
             @Valid @RequestBody RegisterHrRequest request) {
@@ -88,6 +91,7 @@ public class AuthController {
     //==============================================
     // Get Pending HR Requests
     //==============================================
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pending-hr")
     public ResponseEntity<List<User>> getPendingHrRequests() {
 
@@ -97,6 +101,7 @@ public class AuthController {
     //==============================================
     // Approve HR
     //==============================================
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/approve-hr/{id}")
     public ResponseEntity<String> approveHr(
             @PathVariable Integer id) {
@@ -107,6 +112,7 @@ public class AuthController {
     //==============================================
     // Reject HR
     //==============================================
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/reject-hr/{id}")
     public ResponseEntity<String> rejectHr(
             @PathVariable Integer id) {

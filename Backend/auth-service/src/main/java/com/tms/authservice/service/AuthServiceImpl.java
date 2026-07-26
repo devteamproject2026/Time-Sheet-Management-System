@@ -14,18 +14,25 @@ import com.tms.authservice.entity.enums.ApprovalStatus;
 import com.tms.authservice.entity.enums.Role;
 import com.tms.authservice.repository.UserRepository;
 
+import com.tms.authservice.security.JwtService;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+	private final UserRepository userRepository;
+	private final BCryptPasswordEncoder passwordEncoder;
+	private final JwtService jwtService;
 
     public AuthServiceImpl(UserRepository userRepository,
-                           BCryptPasswordEncoder passwordEncoder) {
+            BCryptPasswordEncoder passwordEncoder,
+            JwtService jwtService) {
 
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+this.userRepository = userRepository;
+this.passwordEncoder = passwordEncoder;
+this.jwtService = jwtService;
+}
+    
+
 
     //=============================================
     //          GENERIC USER REGISTRATION
@@ -82,11 +89,14 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid Password");
         }
 
+        // Generate JWT Token
+        String token = jwtService.generateToken(user);
+
         return LoginResponse.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .role(user.getRole().name())
-                .token("abc123") // Replace with JWT later
+                .token(token)
                 .message("Login Successful")
                 .build();
     }
