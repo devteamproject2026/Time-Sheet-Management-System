@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -34,23 +35,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // Get Authorization header from request
-        final String authHeader = request.getHeader("Authorization");
+    	String jwt = null;
+    	String username = null;
 
-        // Variables to store JWT and username
-        String jwt = null;
-        String username = null;
+    	Cookie[] cookies = request.getCookies();
 
-        // Check if Authorization header is missing or invalid
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    	if (cookies != null) {
 
-        // Remove "Bearer " prefix
-        jwt = authHeader.substring(7);
+    	    for (Cookie cookie : cookies) {
+
+    	        if ("jwt".equals(cookie.getName())) {
+    	            jwt = cookie.getValue();
+    	            break;
+    	        }
+    	    }
+    	}
+
+    	if (jwt == null) {
+    	    filterChain.doFilter(request, response);
+    	    return;
+    	}
 
         // Extract username from JWT
-        username = jwtService.extractUsername(jwt);
+    	try {
+    	    username = jwtService.extractUsername(jwt);
+    	} catch (Exception e) {
+    	    filterChain.doFilter(request, response);
+    	    return;
+    	}
 
         // Authenticate only if user is not already authenticated
         if (username != null

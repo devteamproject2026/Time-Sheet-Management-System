@@ -19,10 +19,14 @@ import com.tms.authservice.service.AuthService;
 
 import jakarta.validation.Valid;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
+
+
 @RestController
 @RequestMapping("/api/auth")
 @Validated
-@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final AuthService authService;
@@ -83,9 +87,22 @@ public class AuthController {
     //==============================================
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody LoginRequest request) {
+            @Valid @RequestBody LoginRequest request,
+            HttpServletResponse response) {
 
-        return ResponseEntity.ok(authService.login(request));
+        LoginResponse loginResponse = authService.login(request);
+
+        Cookie cookie = new Cookie("jwt", loginResponse.getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);          // true in production
+        cookie.setPath("/");
+        cookie.setMaxAge(24 * 60 * 60);
+
+        response.addCookie(cookie);
+
+        //loginResponse.setToken(null);
+
+        return ResponseEntity.ok(loginResponse);
     }
 
     //==============================================
@@ -119,4 +136,22 @@ public class AuthController {
 
         return ResponseEntity.ok(authService.rejectHr(id));
     }
+    
+    
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logout Successful");
+    }
+    
+    
+    
+    
 }
