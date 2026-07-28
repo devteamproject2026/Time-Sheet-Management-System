@@ -1,15 +1,16 @@
-
 import { useState } from "react";
 import "./HrUserForm.css";
 
 export default function CreateEmployee() {
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    fname: "",
-    lname: "",
+    firstName: "",
+    lastName: "",
     email: "",
     contact: "",
+    joiningDate: "",
   });
 
   const [msg, setMsg] = useState("");
@@ -24,18 +25,31 @@ export default function CreateEmployee() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:9000/create-employee", {
+    fetch("http://localhost:8081/api/auth/register-employee", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     })
-      .then((resp) => {
-        if (resp.status === 201) {
-          setMsg("Employee Created Successfully");
+      .then(async (resp) => {
+        const message = await resp.text();
+
+        if (resp.ok) {
+          setMsg(message);
+
+          setFormData({
+            username: "",
+            password: "",
+            firstName: "",
+            lastName: "",
+            email: "",
+            contact: "",
+            joiningDate: "",
+          });
         } else {
-          setMsg("Employee Creation Failed");
+          setMsg(message);
         }
       })
       .catch((err) => {
@@ -46,31 +60,39 @@ export default function CreateEmployee() {
 
   return (
     <section className="hr-user-page">
+
       <div className="hr-user-header">
         <div>
           <p className="hr-user-kicker">HR Setup</p>
+
           <h1>Create Employee</h1>
+
           <p>
-            Add an employee account so they can access assigned work and submit
-            weekly timesheets.
+            Add an employee account so they can access assigned work and
+            submit weekly timesheets.
           </p>
         </div>
       </div>
 
       <div className="hr-user-layout">
+
         <form className="hr-user-form-card" onSubmit={handleSubmit}>
+
           <div className="form-card-heading">
             <p>Employee Details</p>
             <h2>Account Information</h2>
           </div>
 
           <div className="form-grid">
+
             <div className="form-field">
-              <label htmlFor="employee-fname">First name</label>
+              <label htmlFor="employee-firstName">First Name</label>
+
               <input
-                id="employee-fname"
-                name="fname"
-                value={formData.fname}
+                id="employee-firstName"
+                type="text"
+                name="firstName"
+                value={formData.firstName}
                 placeholder="Enter first name"
                 onChange={handleChange}
                 required
@@ -78,11 +100,13 @@ export default function CreateEmployee() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="employee-lname">Last name</label>
+              <label htmlFor="employee-lastName">Last Name</label>
+
               <input
-                id="employee-lname"
-                name="lname"
-                value={formData.lname}
+                id="employee-lastName"
+                type="text"
+                name="lastName"
+                value={formData.lastName}
                 placeholder="Enter last name"
                 onChange={handleChange}
                 required
@@ -91,8 +115,10 @@ export default function CreateEmployee() {
 
             <div className="form-field">
               <label htmlFor="employee-username">Username</label>
+
               <input
                 id="employee-username"
+                type="text"
                 name="username"
                 value={formData.username}
                 placeholder="Choose username"
@@ -104,10 +130,11 @@ export default function CreateEmployee() {
 
             <div className="form-field">
               <label htmlFor="employee-password">Password</label>
+
               <input
                 id="employee-password"
-                name="password"
                 type="password"
+                name="password"
                 value={formData.password}
                 placeholder="Create password"
                 onChange={handleChange}
@@ -118,10 +145,11 @@ export default function CreateEmployee() {
 
             <div className="form-field">
               <label htmlFor="employee-email">Email</label>
+
               <input
                 id="employee-email"
-                name="email"
                 type="email"
+                name="email"
                 value={formData.email}
                 placeholder="employee@company.com"
                 onChange={handleChange}
@@ -132,10 +160,11 @@ export default function CreateEmployee() {
 
             <div className="form-field">
               <label htmlFor="employee-contact">Contact</label>
+
               <input
                 id="employee-contact"
-                name="contact"
                 type="tel"
+                name="contact"
                 value={formData.contact}
                 placeholder="Enter contact number"
                 onChange={handleChange}
@@ -143,29 +172,55 @@ export default function CreateEmployee() {
                 required
               />
             </div>
+
+            <div className="form-field">
+              <label htmlFor="employee-joiningDate">Joining Date</label>
+
+              <input
+                id="employee-joiningDate"
+                type="date"
+                name="joiningDate"
+                value={formData.joiningDate}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
           </div>
 
           <button className="hr-user-submit" type="submit">
             Create Employee
           </button>
 
-          {msg && <p className="hr-user-message">{msg}</p>}
+          {msg && (
+            <p className="hr-user-message">
+              {msg}
+            </p>
+          )}
+
         </form>
 
         <aside className="hr-user-note">
+
           <p className="hr-user-kicker">Role Access</p>
-          <h2>Employee account</h2>
+
+          <h2>Employee Account</h2>
+
           <p>
             Employees can view assigned projects and tasks, then submit weekly
             timesheets for manager approval.
           </p>
+
           <ul>
             <li>Status is set to approved automatically.</li>
             <li>The account can log in immediately after creation.</li>
             <li>Manager/project mapping can be added in the next module.</li>
           </ul>
+
         </aside>
+
       </div>
+
     </section>
   );
 }

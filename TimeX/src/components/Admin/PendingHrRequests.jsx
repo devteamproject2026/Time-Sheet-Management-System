@@ -12,13 +12,23 @@ export default function PendingHrRequests() {
   const loadPendingHRs = () => {
     setLoading(true);
 
-    fetch("http://localhost:9000/pending-hr")
-      .then((resp) => resp.json())
+    fetch("http://localhost:8081/api/auth/pending-hr", {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(async (resp) => {
+        if (!resp.ok) {
+          throw new Error("Failed to load pending HR requests.");
+        }
+
+        return await resp.json();
+      })
       .then((data) => {
         setHrs(data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err);
         setLoading(false);
         setMessage("Unable to fetch pending requests.");
       });
@@ -27,28 +37,47 @@ export default function PendingHrRequests() {
   const approveHr = (id) => {
     if (!window.confirm("Approve this HR request?")) return;
 
-    fetch(`http://localhost:9000/approve-hr/${id}`, {
+    fetch(`http://localhost:8081/api/auth/approve-hr/${id}`, {
       method: "PUT",
-    }).then(() => {
-      setHrs((prev) => prev.filter((hr) => hr.user_id !== id));
-      setMessage("HR approved successfully.");
-    });
+      credentials: "include",
+    })
+      .then(async (resp) => {
+        if (!resp.ok) {
+          throw new Error("Unable to approve HR.");
+        }
+
+        setHrs((prev) => prev.filter((hr) => hr.userId !== id));
+        setMessage("HR approved successfully.");
+      })
+      .catch((err) => {
+        console.error(err);
+        setMessage("Unable to approve HR.");
+      });
   };
 
   const rejectHr = (id) => {
     if (!window.confirm("Reject this HR request?")) return;
 
-    fetch(`http://localhost:9000/reject-hr/${id}`, {
+    fetch(`http://localhost:8081/api/auth/reject-hr/${id}`, {
       method: "PUT",
-    }).then(() => {
-      setHrs((prev) => prev.filter((hr) => hr.user_id !== id));
-      setMessage("HR rejected successfully.");
-    });
+      credentials: "include",
+    })
+      .then(async (resp) => {
+        if (!resp.ok) {
+          throw new Error("Unable to reject HR.");
+        }
+
+        setHrs((prev) => prev.filter((hr) => hr.userId !== id));
+        setMessage("HR rejected successfully.");
+      })
+      .catch((err) => {
+        console.error(err);
+        setMessage("Unable to reject HR.");
+      });
   };
 
   return (
     <div className="container mt-4">
-
       <div className="card shadow-lg border-0">
 
         <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -62,7 +91,7 @@ export default function PendingHrRequests() {
         <div className="card-body">
 
           {message && (
-            <div className="alert alert-success">
+            <div className="alert alert-info">
               {message}
             </div>
           )}
@@ -96,34 +125,30 @@ export default function PendingHrRequests() {
               <tbody>
 
                 {hrs.map((hr) => (
-                  <tr key={hr.user_id}>
+                  <tr key={hr.userId}>
 
-                    <td>{hr.user_id}</td>
+                    <td>{hr.userId}</td>
 
                     <td>{hr.username}</td>
 
                     <td>{hr.email}</td>
 
                     <td className="text-center">
-
                       <button
                         className="btn btn-success btn-sm"
-                        onClick={() => approveHr(hr.user_id)}
+                        onClick={() => approveHr(hr.userId)}
                       >
                         ✔ Approve
                       </button>
-
                     </td>
 
                     <td className="text-center">
-
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() => rejectHr(hr.user_id)}
+                        onClick={() => rejectHr(hr.userId)}
                       >
                         ✖ Reject
                       </button>
-
                     </td>
 
                   </tr>
@@ -133,6 +158,7 @@ export default function PendingHrRequests() {
 
             </table>
           )}
+
         </div>
       </div>
     </div>

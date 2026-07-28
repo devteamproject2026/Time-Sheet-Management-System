@@ -8,8 +8,16 @@ export default function LogoutComp() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(logout());
-    navigate("/", { replace: true });
+
+    fetch("http://localhost:8081/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    })
+      .finally(() => {
+        dispatch(logout());
+        navigate("/", { replace: true });
+      });
+
   }, [dispatch, navigate]);
 
   return null;
