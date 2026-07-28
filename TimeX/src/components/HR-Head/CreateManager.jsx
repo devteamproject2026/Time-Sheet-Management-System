@@ -1,15 +1,16 @@
-
 import { useState } from "react";
 import "./HrUserForm.css";
 
 export default function CreateManager() {
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    fname: "",
-    lname: "",
+    firstName: "",
+    lastName: "",
     email: "",
     contact: "",
+    joiningDate: "",
   });
 
   const [msg, setMsg] = useState("");
@@ -24,18 +25,31 @@ export default function CreateManager() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:9000/create-manager", {
+    fetch("http://localhost:8081/api/auth/register-manager", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     })
-      .then((resp) => {
-        if (resp.status === 201) {
-          setMsg("Manager Created Successfully");
+      .then(async (resp) => {
+        const message = await resp.text();
+
+        if (resp.ok) {
+          setMsg(message);
+
+          setFormData({
+            username: "",
+            password: "",
+            firstName: "",
+            lastName: "",
+            email: "",
+            contact: "",
+            joiningDate: "",
+          });
         } else {
-          setMsg("Manager Creation Failed");
+          setMsg(message);
         }
       })
       .catch((err) => {
@@ -46,10 +60,13 @@ export default function CreateManager() {
 
   return (
     <section className="hr-user-page">
+
       <div className="hr-user-header">
         <div>
           <p className="hr-user-kicker">HR Setup</p>
+
           <h1>Create Manager</h1>
+
           <p>
             Add a manager account so they can handle team tasks and review
             employee timesheets.
@@ -58,19 +75,24 @@ export default function CreateManager() {
       </div>
 
       <div className="hr-user-layout">
+
         <form className="hr-user-form-card" onSubmit={handleSubmit}>
+
           <div className="form-card-heading">
             <p>Manager Details</p>
             <h2>Account Information</h2>
           </div>
 
           <div className="form-grid">
+
             <div className="form-field">
-              <label htmlFor="manager-fname">First name</label>
+              <label htmlFor="manager-firstName">First Name</label>
+
               <input
-                id="manager-fname"
-                name="fname"
-                value={formData.fname}
+                id="manager-firstName"
+                type="text"
+                name="firstName"
+                value={formData.firstName}
                 placeholder="Enter first name"
                 onChange={handleChange}
                 required
@@ -78,11 +100,13 @@ export default function CreateManager() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="manager-lname">Last name</label>
+              <label htmlFor="manager-lastName">Last Name</label>
+
               <input
-                id="manager-lname"
-                name="lname"
-                value={formData.lname}
+                id="manager-lastName"
+                type="text"
+                name="lastName"
+                value={formData.lastName}
                 placeholder="Enter last name"
                 onChange={handleChange}
                 required
@@ -91,8 +115,10 @@ export default function CreateManager() {
 
             <div className="form-field">
               <label htmlFor="manager-username">Username</label>
+
               <input
                 id="manager-username"
+                type="text"
                 name="username"
                 value={formData.username}
                 placeholder="Choose username"
@@ -104,10 +130,11 @@ export default function CreateManager() {
 
             <div className="form-field">
               <label htmlFor="manager-password">Password</label>
+
               <input
                 id="manager-password"
-                name="password"
                 type="password"
+                name="password"
                 value={formData.password}
                 placeholder="Create password"
                 onChange={handleChange}
@@ -118,10 +145,11 @@ export default function CreateManager() {
 
             <div className="form-field">
               <label htmlFor="manager-email">Email</label>
+
               <input
                 id="manager-email"
-                name="email"
                 type="email"
+                name="email"
                 value={formData.email}
                 placeholder="manager@company.com"
                 onChange={handleChange}
@@ -132,10 +160,11 @@ export default function CreateManager() {
 
             <div className="form-field">
               <label htmlFor="manager-contact">Contact</label>
+
               <input
                 id="manager-contact"
-                name="contact"
                 type="tel"
+                name="contact"
                 value={formData.contact}
                 placeholder="Enter contact number"
                 onChange={handleChange}
@@ -143,29 +172,55 @@ export default function CreateManager() {
                 required
               />
             </div>
+
+            <div className="form-field">
+              <label htmlFor="manager-joiningDate">Joining Date</label>
+
+              <input
+                id="manager-joiningDate"
+                type="date"
+                name="joiningDate"
+                value={formData.joiningDate}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
           </div>
 
           <button className="hr-user-submit" type="submit">
             Create Manager
           </button>
 
-          {msg && <p className="hr-user-message">{msg}</p>}
+          {msg && (
+            <p className="hr-user-message">
+              {msg}
+            </p>
+          )}
+
         </form>
 
         <aside className="hr-user-note">
+
           <p className="hr-user-kicker">Role Access</p>
-          <h2>Manager account</h2>
+
+          <h2>Manager Account</h2>
+
           <p>
-            Managers can view assigned team members, manage project tasks, and
-            approve or reject submitted timesheets.
+            Managers can view assigned team members, manage project tasks,
+            and approve or reject submitted timesheets.
           </p>
+
           <ul>
             <li>Status is set to approved automatically.</li>
             <li>The account can log in immediately after creation.</li>
             <li>Project/team assignment can be added in the next module.</li>
           </ul>
+
         </aside>
+
       </div>
+
     </section>
   );
 }

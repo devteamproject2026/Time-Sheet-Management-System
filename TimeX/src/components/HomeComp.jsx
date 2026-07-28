@@ -31,7 +31,7 @@ export default function HomeComp() {
         <NavLink className="home-brand" to="/">
           <span>WP</span>
           <div>
-            <strong>WorkPulse</strong>
+            <strong>WorkPuls</strong>
             <small>Timesheet Management</small>
           </div>
         </NavLink>
@@ -49,7 +49,7 @@ export default function HomeComp() {
           <p className="home-kicker">Time Sheet Management System</p>
           <h1>Manage work hours, projects, and approvals in one place.</h1>
           <p>
-            WorkPulse helps organizations track weekly timesheets, manage people,
+            WorkPuls helps organizations track weekly timesheets, manage people,
             and keep approvals clear across HR, managers, and employees.
           </p>
 
@@ -101,7 +101,7 @@ export default function HomeComp() {
       <section className="home-section workflow-section">
         <div className="section-heading">
           <p className="home-kicker">Process</p>
-          <h2>How WorkPulse works</h2>
+          <h2>How WorkPuls works</h2>
         </div>
 
         <ol className="workflow-list">
