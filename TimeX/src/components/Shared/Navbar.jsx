@@ -1,16 +1,15 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../redux/authslice";
 import "./Navbar.css";
 
 export default function Navbar() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/", { replace: true });
+    // Use LogoutComponent so the backend removes the HttpOnly JWT cookie
+    // before Redux is cleared. Otherwise a refresh could restore the session.
+    navigate("/logout");
   };
 
   const getRoleName = (role) => {
