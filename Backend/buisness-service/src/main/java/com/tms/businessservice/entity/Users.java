@@ -36,9 +36,6 @@ public class Users {
     @Column(name = "role")
     private String role;
 
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "joining_date")
     private LocalDate joiningDate;
 
@@ -137,16 +134,6 @@ public class Users {
     }
 
 
-    public String getStatus() {
-        return status;
-    }
-
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-
     public LocalDate getJoiningDate() {
         return joiningDate;
     }
@@ -197,7 +184,6 @@ public class Users {
                 ", email='" + email + '\'' +
                 ", contact='" + contact + '\'' +
                 ", role='" + role + '\'' +
-                ", status='" + status + '\'' +
                 ", joiningDate=" + joiningDate +
                 ", createdAt=" + createdAt +
                 ", accountStatus='" + accountStatus + '\'' +

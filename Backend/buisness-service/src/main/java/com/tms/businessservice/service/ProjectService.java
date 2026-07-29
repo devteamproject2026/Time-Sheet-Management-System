@@ -1,0 +1,27 @@
+package com.tms.businessservice.service;
+
+import java.util.List;
+
+import com.tms.businessservice.dto.request.ProjectRequest;
+import com.tms.businessservice.dto.response.ProjectResponse;
+
+/**
+ * Defines the business operations available for Projects.
+ *
+ * The REST controller added in the next step will call this interface instead
+ * of communicating directly with database repositories.
+ */
+public interface ProjectService {
+
+    ProjectResponse createProject(ProjectRequest request);
+
+    List<ProjectResponse> getAllProjects();
+
+    ProjectResponse getProjectById(Integer projectId);
+
+    ProjectResponse updateProject(
+            Integer projectId,
+            ProjectRequest request);
+
+    void deleteProject(Integer projectId);
+}
