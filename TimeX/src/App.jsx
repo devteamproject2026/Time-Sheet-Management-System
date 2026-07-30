@@ -1,5 +1,7 @@
-
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { finishSessionCheck, restoreSession } from "./redux/authslice";
 
 // Layouts
 import ProtectedLayout from "./components/Shared/ProtectedLayout";
@@ -40,6 +42,57 @@ import EmployeeDashboard from "./components/Employee/EmployeeDashboard";
 // import CreateManager from "./components/HR-Head/CreateManager";
 
 function App() {
+  const dispatch = useDispatch();
+  const isInitializing = useSelector((state) => state.auth.isInitializing);
+  const sessionCheckStarted = useRef(false);
+
+  useEffect(() => {
+    // React StrictMode runs effects twice in development. This guard prevents
+    // two identical /me requests during the initial session check.
+    if (sessionCheckStarted.current) return;
+    sessionCheckStarted.current = true;
+
+    fetch("http://localhost:8081/api/auth/me", {
+      method: "GET",
+      // The JWT is stored in an HttpOnly cookie, so the browser must include it.
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((data) => {
+        if (!data) {
+          dispatch(finishSessionCheck());
+          return;
+        }
+
+        dispatch(
+          restoreSession({
+            user: {
+              userId: data.userId,
+              username: data.username,
+              role: data.role,
+            },
+          })
+        );
+      })
+      .catch(() => {
+        // A missing, expired, or unreachable session should behave as logged out.
+        dispatch(finishSessionCheck());
+      });
+  }, [dispatch]);
+
+  // Avoid redirecting to /login before the cookie check has completed.
+  if (isInitializing) {
+    return (
+      <div className="container mt-5 text-center">
+        <div className="spinner-border text-primary" role="status"></div>
+        <p className="mt-3">Checking your session...</p>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>

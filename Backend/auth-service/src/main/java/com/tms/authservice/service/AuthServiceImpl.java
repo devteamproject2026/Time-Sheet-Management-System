@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
 import com.tms.authservice.dto.LoginResponse;
 import com.tms.authservice.dto.RegisterHrRequest;
@@ -98,6 +99,30 @@ this.jwtService = jwtService;
                 .role(user.getRole().name())
                 .token(token)
                 .message("Login Successful")
+                .build();
+    }
+
+    //=============================================
+    //       RESTORE AUTHENTICATED USER SESSION
+    //=============================================
+    @Override
+    public CurrentUserResponse getCurrentUser(String username) {
+
+        // Re-check the database so an inactive or unapproved account is not
+        // restored only because an older JWT cookie is still present.
+        User user = userRepository
+                .findByUsernameAndApprovalStatusAndAccountStatus(
+                        username,
+                        ApprovalStatus.APPROVED,
+                        AccountStatus.ACTIVE)
+                .orElseThrow(() ->
+                        new RuntimeException("User account is not active"));
+
+        // Return only the information required by Redux and route authorization.
+        return CurrentUserResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .role(user.getRole().name())
                 .build();
     }
 

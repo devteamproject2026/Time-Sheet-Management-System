@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
 import com.tms.authservice.dto.LoginResponse;
 import com.tms.authservice.dto.RegisterHrRequest;
@@ -103,6 +105,19 @@ public class AuthController {
         //loginResponse.setToken(null);
 
         return ResponseEntity.ok(loginResponse);
+    }
+
+    //==============================================
+    // Restore Current Login After Browser Refresh
+    //==============================================
+    @GetMapping("/me")
+    public ResponseEntity<CurrentUserResponse> getCurrentUser(
+            Authentication authentication) {
+
+        // JwtAuthenticationFilter validates the HttpOnly cookie before this
+        // method runs, so authentication.getName() is the verified username.
+        return ResponseEntity.ok(
+                authService.getCurrentUser(authentication.getName()));
     }
 
     //==============================================
