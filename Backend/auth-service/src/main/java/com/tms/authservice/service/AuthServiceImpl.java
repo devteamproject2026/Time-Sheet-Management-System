@@ -2,9 +2,12 @@ package com.tms.authservice.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.tms.authservice.dto.ChangePasswordRequest;
 import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
 import com.tms.authservice.dto.LoginResponse;
@@ -171,6 +174,43 @@ this.jwtService = jwtService;
         userRepository.save(user);
 
         return "HR Rejected Successfully";
+    }
+    
+    
+  //=============================================
+  //             REST PASSWORD 
+  //=============================================
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        // Verify current password
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+
+        // Verify new password and confirm password
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("New password and confirm password do not match.");
+        }
+
+        // Prevent using the same password
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("New password must be different from the current password.");
+        }
+
+        // Encode and save new password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(user);
     }
 
 }
