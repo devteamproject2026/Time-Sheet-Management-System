@@ -61,7 +61,7 @@ export default function HrRegistration() {
           <span>WP</span>
 
           <div>
-            <strong>WorkPulse</strong>
+            <strong>WorkPuls</strong>
             <small>Timesheet Management</small>
           </div>
         </NavLink>

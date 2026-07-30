@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children, role }) {
       return <Navigate to="/login" />;
    }
    //Role
-   if (loginstate.user.role !== role) {
+   if ( role && loginstate.user.role !== role) {
       return <Navigate to="/unauthorized" />;
    }
 

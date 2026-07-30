@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.tms.authservice.dto.ChangePasswordRequest;
 import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
 import com.tms.authservice.dto.LoginResponse;
@@ -152,7 +153,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.rejectHr(id));
     }
     
-    
+    //==============================================
+    // 				LOGOUT
+    //==============================================
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletResponse response) {
 
@@ -166,6 +169,18 @@ public class AuthController {
         return ResponseEntity.ok("Logout Successful");
     }
     
+    
+    //==============================================
+    // 				Reset Password
+    //==============================================
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        authService.changePassword(request);
+
+        return ResponseEntity.ok("Password changed successfully.");
+    }
     
     
     

@@ -83,7 +83,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <small className="text-muted">WorkPulse v1.0</small>
+        <small className="text-muted">WorkPuls v1.0</small>
       </div>
     </aside>
   );

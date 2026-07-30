@@ -34,6 +34,7 @@ export default function HrDashboard() {
           <NavLink className="secondary-action" to="/hr/create-manager">
             Add Manager
           </NavLink>
+          
         </div>
       </div>
 

@@ -29,6 +29,7 @@ import ManagerDashboard from "./components/Manager/ManagerDashboard";
 
 // Employee Pages
 import EmployeeDashboard from "./components/Employee/EmployeeDashboard";
+import ChangePassword from "./components/Shared/ChangePassword";
 
 // import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -167,7 +168,21 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+                <Route
+        path="/change-password"
+        element={
+            <ProtectedRoute>
+                <ChangePassword />
+            </ProtectedRoute>
+        }
+    />
+
+
+
         </Route>
+
+        
 
         {/* Catch all - 404 */}
         <Route path="*" element={<div className="container mt-5"><h1>Page Not Found</h1></div>} />
