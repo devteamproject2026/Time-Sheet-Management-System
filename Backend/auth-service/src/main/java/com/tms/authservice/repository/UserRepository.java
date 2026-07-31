@@ -34,4 +34,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             Role role,
             ApprovalStatus approvalStatus);
 
+    /**
+     * Finds approved and active users of one role for safe HR lookup lists.
+     */
+    List<User> findByRoleAndApprovalStatusAndAccountStatusOrderByFirstNameAscLastNameAsc(
+            Role role,
+            ApprovalStatus approvalStatus,
+            AccountStatus accountStatus);
+
 }

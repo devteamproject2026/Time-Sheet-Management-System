@@ -5,8 +5,18 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Immutable;
+
+/**
+ * Read-only reference to user data owned by Auth Service.
+ *
+ * Business Service needs the user ID, role, and account state to validate
+ * Manager/Employee assignments. It deliberately does not map the password
+ * column because this service never authenticates passwords.
+ */
 @Entity
 @Table(name = "users")
+@Immutable
 @Data
 public class Users {
 
@@ -17,9 +27,6 @@ public class Users {
 
     @Column(name = "username")
     private String username;
-
-    @Column(name = "password")
-    private String password;
 
     @Column(name = "first_name")
     private String firstName;
@@ -71,16 +78,6 @@ public class Users {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-
-    public String getPassword() {
-        return password;
-    }
-
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
 
@@ -178,7 +175,6 @@ public class Users {
         return "Users{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +

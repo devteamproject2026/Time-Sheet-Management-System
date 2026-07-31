@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,9 +26,9 @@ import jakarta.validation.Valid;
  *
  * Base URL: /api/business/projects
  *
- * ADMIN and HR_HEAD manage the complete Project records. MANAGER and EMPLOYEE
- * are intentionally excluded here because they must later receive restricted
- * APIs that return only Projects assigned to them.
+ * HR_HEAD creates and updates normal Project business data. ADMIN and HR_HEAD
+ * can read all Projects, while ADMIN alone may permanently delete one. MANAGER
+ * and EMPLOYEE receive separate APIs that return only their own Projects.
  */
 @RestController
 @RequestMapping("/api/business/projects")
@@ -45,11 +46,12 @@ public class ProjectController {
      * Creates a Project and connects it to an existing Client, Manager and HR
      * Head. Returns HTTP 201 Created with the saved Project.
      *
-     * Allowed roles:
-     * ADMIN    - may create records while supervising the complete system.
-     * HR_HEAD  - normally creates and assigns Projects during daily operations.
+     * Allowed role: HR_HEAD only.
+     *
+     * HR Head performs daily Project setup and Manager assignment. ADMIN keeps
+     * read access for supervision instead of changing operational data.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(
             @Valid @RequestBody ProjectRequest request) {
@@ -78,13 +80,49 @@ public class ProjectController {
     }
 
     /**
+     * GET /api/business/projects/my-managed-projects
+     *
+     * Returns only Projects whose manager_id belongs to the logged-in Manager.
+     * No Manager ID is accepted from the URL, preventing one Manager from
+     * requesting another Manager's Projects.
+     */
+    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/my-managed-projects")
+    public ResponseEntity<List<ProjectResponse>> getMyManagedProjects(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                projectService.getMyManagedProjects(
+                        authentication.getName()));
+    }
+
+    /**
+     * GET /api/business/projects/my-assigned-projects
+     *
+     * Returns only Projects connected to the logged-in Employee through the
+     * employee_projects table. The Employee identity comes from the JWT.
+     */
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping("/my-assigned-projects")
+    public ResponseEntity<List<ProjectResponse>> getMyAssignedProjects(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                projectService.getMyAssignedProjects(
+                        authentication.getName()));
+    }
+
+    /**
      * GET /api/business/projects/{projectId}
      *
      * Returns one Project using its numeric ID, or HTTP 404 if it does not
-     * exist. Manager/Employee ownership checks will be implemented through
-     * separate assigned-Project APIs later.
+     * exist. Manager and Employee use the separate scoped APIs above instead
+     * of accessing arbitrary Project IDs.
      *
      * Allowed roles: ADMIN and HR_HEAD.
+     *
+     * HR Head uses this for daily work, while ADMIN has read-only access for
+     * supervision and auditing.
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
     @GetMapping("/{projectId}")
@@ -101,9 +139,12 @@ public class ProjectController {
      * Updates Project details and can change the Client, Manager, HR Head,
      * dates, or status. Returns HTTP 404 when the Project does not exist.
      *
-     * Allowed roles: ADMIN and HR_HEAD.
+     * Allowed role: HR_HEAD only.
+     *
+     * HR Head maintains Project business details. ADMIN retains read access for
+     * supervision but does not change operational data.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @PutMapping("/{projectId}")
     public ResponseEntity<ProjectResponse> updateProject(
             @PathVariable Integer projectId,

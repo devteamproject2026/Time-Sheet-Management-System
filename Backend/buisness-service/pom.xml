@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.tms</groupId>
-	<artifactId>WorkPlusSpringboot</artifactId>
+	<artifactId>buisness-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>CountrySpringBoot-1</name>
 	<description/>

@@ -99,7 +99,9 @@ public class SecurityConfig {
                         // HR APIs
                         .requestMatchers(
                                 "/api/auth/register-manager",
-                                "/api/auth/register-employee"
+                                "/api/auth/register-employee",
+                                "/api/auth/users/managers",
+                                "/api/auth/users/employees"
                         ).hasRole("HR_HEAD")
 
                         // Manager APIs

@@ -9,6 +9,7 @@ import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
 import com.tms.authservice.dto.LoginResponse;
 import com.tms.authservice.dto.RegisterHrRequest;
+import com.tms.authservice.dto.UserLookupResponse;
 import com.tms.authservice.entity.User;
 import com.tms.authservice.entity.enums.AccountStatus;
 import com.tms.authservice.entity.enums.ApprovalStatus;
@@ -123,6 +124,53 @@ this.jwtService = jwtService;
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .role(user.getRole().name())
+                .build();
+    }
+
+    //=============================================
+    //       ACTIVE MANAGER/EMPLOYEE LOOKUPS
+    //=============================================
+    @Override
+    public List<UserLookupResponse> getActiveManagers() {
+
+        return getActiveUsersByRole(Role.MANAGER);
+    }
+
+    @Override
+    public List<UserLookupResponse> getActiveEmployees() {
+
+        return getActiveUsersByRole(Role.EMPLOYEE);
+    }
+
+    /**
+     * Returns only approved and active users. This prevents HR from assigning
+     * an inactive account to a Project.
+     */
+    private List<UserLookupResponse> getActiveUsersByRole(Role role) {
+
+        return userRepository
+                .findByRoleAndApprovalStatusAndAccountStatusOrderByFirstNameAscLastNameAsc(
+                        role,
+                        ApprovalStatus.APPROVED,
+                        AccountStatus.ACTIVE)
+                .stream()
+                .map(this::toLookupResponse)
+                .toList();
+    }
+
+    /**
+     * Converts the User entity to a safe DTO. The password is never returned.
+     */
+    private UserLookupResponse toLookupResponse(User user) {
+
+        String fullName =
+                (user.getFirstName() + " " + user.getLastName()).trim();
+
+        return UserLookupResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .fullName(fullName)
+                .email(user.getEmail())
                 .build();
     }
 

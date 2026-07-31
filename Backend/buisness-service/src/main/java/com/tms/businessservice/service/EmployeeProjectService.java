@@ -8,8 +8,9 @@ import com.tms.businessservice.dto.response.EmployeeProjectResponse;
 /**
  * Defines operations for assigning Employees to Projects.
  *
- * actorUsername is the verified username from Spring Security. It allows the
- * service to enforce Manager ownership instead of trusting a request body.
+ * actorUsername is the verified username from Spring Security. The service
+ * uses it to validate the current account and to enforce Manager ownership
+ * for the read-only Project-team operation.
  */
 public interface EmployeeProjectService {
 

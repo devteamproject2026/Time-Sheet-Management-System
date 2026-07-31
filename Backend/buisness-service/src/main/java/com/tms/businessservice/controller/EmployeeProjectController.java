@@ -25,8 +25,9 @@ import jakarta.validation.Valid;
  *
  * Base URL: /api/business/employee-projects
  *
- * @PreAuthorize performs the first role check. The service performs a second,
- * data-level check so a Manager can operate only on their own Projects.
+ * @PreAuthorize performs the first role check. The service also validates the
+ * logged-in user's account and makes sure a Manager can view only the team of
+ * a Project managed by that Manager.
  */
 @RestController
 @RequestMapping("/api/business/employee-projects")
@@ -45,10 +46,12 @@ public class EmployeeProjectController {
      *
      * Assigns one active Employee to one Project.
      *
-     * ADMIN/HR_HEAD may assign Employees to any Project.
-     * MANAGER may assign Employees only to a Project managed by that Manager.
+     * Allowed role: HR_HEAD.
+     *
+     * Assigning staff is an HR business responsibility. ADMIN and MANAGER are
+     * intentionally not allowed to change Project staffing.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD', 'MANAGER')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @PostMapping
     public ResponseEntity<EmployeeProjectResponse> assignEmployee(
             @Valid @RequestBody EmployeeProjectRequest request,
@@ -69,10 +72,10 @@ public class EmployeeProjectController {
      *
      * Returns every Employee-Project assignment in the company.
      *
-     * Allowed roles: ADMIN and HR_HEAD because this exposes assignments from
-     * every Project and Manager.
+     * Allowed role: HR_HEAD because this exposes assignments from every
+     * Project and Manager.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @GetMapping
     public ResponseEntity<List<EmployeeProjectResponse>> getAllAssignments(
             Authentication authentication) {
@@ -87,10 +90,10 @@ public class EmployeeProjectController {
      *
      * Returns the team assigned to one Project.
      *
-     * ADMIN/HR_HEAD may view any Project team.
+     * HR_HEAD may view any Project team.
      * MANAGER may view only the team of a Project managed by that Manager.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('HR_HEAD', 'MANAGER')")
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<EmployeeProjectResponse>>
             getAssignmentsByProject(
@@ -108,10 +111,10 @@ public class EmployeeProjectController {
      *
      * Returns all Project assignments for one Employee.
      *
-     * Allowed roles: ADMIN and HR_HEAD. A Manager is not given this endpoint
-     * because it could reveal the Employee's work under other Managers.
+     * Allowed role: HR_HEAD. A Manager is not given this endpoint because it
+     * could reveal the Employee's work under other Managers.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @GetMapping("/employee/{employeeId}")
     public ResponseEntity<List<EmployeeProjectResponse>>
             getAssignmentsByEmployee(
@@ -146,10 +149,12 @@ public class EmployeeProjectController {
      *
      * Removes an Employee from a Project and returns HTTP 204 No Content.
      *
-     * ADMIN/HR_HEAD may remove any assignment.
-     * MANAGER may remove assignments only from their own Projects.
+     * Allowed role: HR_HEAD.
+     *
+     * Removing staff is an HR business responsibility. A Manager may view
+     * their team but cannot change the assignment.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD', 'MANAGER')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @DeleteMapping("/{employeeProjectId}")
     public ResponseEntity<Void> removeAssignment(
             @PathVariable Integer employeeProjectId,

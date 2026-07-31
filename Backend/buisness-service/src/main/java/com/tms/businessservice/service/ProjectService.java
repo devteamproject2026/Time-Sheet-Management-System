@@ -17,6 +17,10 @@ public interface ProjectService {
 
     List<ProjectResponse> getAllProjects();
 
+    List<ProjectResponse> getMyManagedProjects(String managerUsername);
+
+    List<ProjectResponse> getMyAssignedProjects(String employeeUsername);
+
     ProjectResponse getProjectById(Integer projectId);
 
     ProjectResponse updateProject(
