@@ -83,7 +83,7 @@ export default function LoginComp() {
         <div className="brand-mark">WP</div>
 
         <div>
-          <p className="login-kicker">WorkPulse</p>
+          <p className="login-kicker">WorkPuls</p>
 
           <h1>Time Sheet Management System</h1>
 

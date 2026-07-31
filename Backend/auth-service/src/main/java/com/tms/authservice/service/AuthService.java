@@ -2,6 +2,7 @@ package com.tms.authservice.service;
 
 import java.util.List;
 
+import com.tms.authservice.dto.ChangePasswordRequest;
 import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
 import com.tms.authservice.dto.LoginResponse;
@@ -39,5 +40,8 @@ public interface AuthService {
 
     // Reject HR
     String rejectHr(Integer userId);
+    
+    // Reset Password
+    void changePassword(ChangePasswordRequest request);
 
 }

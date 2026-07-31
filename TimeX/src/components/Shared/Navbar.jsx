@@ -3,22 +3,26 @@ import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
+
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
 
   const handleLogout = () => {
-    // Use LogoutComponent so the backend removes the HttpOnly JWT cookie
-    // before Redux is cleared. Otherwise a refresh could restore the session.
     navigate("/logout");
+  };
+
+  const handleChangePassword = () => {
+    navigate("/change-password");
   };
 
   const getRoleName = (role) => {
     const roleMap = {
-      "ADMIN": "Admin",
-      "HR_HEAD": "HR Head",
-      "MANAGER": "Manager",
-      "EMPLOYEE": "Employee"
+      ADMIN: "Admin",
+      HR_HEAD: "HR Head",
+      MANAGER: "Manager",
+      EMPLOYEE: "Employee",
     };
+
     return roleMap[role] || role;
   };
 
@@ -27,20 +31,33 @@ export default function Navbar() {
 
   return (
     <nav className="app-navbar">
+
       <div className="navbar-brand-group">
         <span className="navbar-mark">WP</span>
+
         <div>
           <span className="navbar-title">WorkPulse</span>
-          <span className="navbar-subtitle">Timesheet Management</span>
+          <span className="navbar-subtitle">
+            Timesheet Management
+          </span>
         </div>
       </div>
 
       <div className="navbar-actions">
+
         <div className="navbar-user">
-          <span className="user-avatar">{userInitial}</span>
+          <span className="user-avatar">
+            {userInitial}
+          </span>
+
           <div className="user-info">
-            <span className="user-name">{username}</span>
-            <span className="user-role">{getRoleName(auth.user?.role)}</span>
+            <span className="user-name">
+              {username}
+            </span>
+
+            <span className="user-role">
+              {getRoleName(auth.user?.role)}
+            </span>
           </div>
         </div>
 
@@ -49,34 +66,44 @@ export default function Navbar() {
         </span>
 
         <button
+          className="change-password-button"
+          onClick={handleChangePassword}
+          type="button"
+        >
+          Change Password
+        </button>
+
+        <button
           className="logout-button"
           onClick={handleLogout}
-          title="Logout"
           type="button"
         >
           Logout
         </button>
+
       </div>
+
     </nav>
   );
 }
 
 function getRoleClass(role) {
+
   switch (role) {
+
     case "ADMIN":
       return "admin";
+
     case "HR_HEAD":
       return "hr";
+
     case "MANAGER":
       return "manager";
+
     case "EMPLOYEE":
       return "employee";
+
     default:
       return "default";
   }
 }
-
-
-//--------------------------------
-
-
