@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * JSON data accepted when an Admin or HR Head creates or updates a Project.
+ * JSON data accepted when an HR Head creates or updates a Project.
  *
  * The frontend/Postman sends related record IDs. The service layer will later
  * load the matching Client, Manager, and HR Head entities from the database.

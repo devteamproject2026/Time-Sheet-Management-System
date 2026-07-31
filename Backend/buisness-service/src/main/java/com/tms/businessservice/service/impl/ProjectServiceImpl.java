@@ -3,6 +3,7 @@ package com.tms.businessservice.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import com.tms.businessservice.service.ProjectService;
 public class ProjectServiceImpl implements ProjectService {
 
     private static final String MANAGER_ROLE = "MANAGER";
+    private static final String EMPLOYEE_ROLE = "EMPLOYEE";
     private static final String HR_HEAD_ROLE = "HR_HEAD";
     private static final String ACTIVE_STATUS = "ACTIVE";
     private static final String APPROVED_STATUS = "APPROVED";
@@ -89,6 +91,49 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectResponse> getAllProjects() {
 
         return projectRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Returns only Projects owned by the logged-in Manager.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProjectResponse> getMyManagedProjects(
+            String managerUsername) {
+
+        Users manager = findCurrentUserWithRole(
+                managerUsername,
+                MANAGER_ROLE,
+                "Manager");
+
+        return projectRepository
+                .findByManager_UsernameOrderByCreatedAtDesc(
+                        manager.getUsername())
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Returns only Projects connected to the logged-in Employee through the
+     * employee_projects table.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProjectResponse> getMyAssignedProjects(
+            String employeeUsername) {
+
+        Users employee = findCurrentUserWithRole(
+                employeeUsername,
+                EMPLOYEE_ROLE,
+                "Employee");
+
+        return projectRepository
+                .findAssignedProjectsByEmployeeUsername(
+                        employee.getUsername())
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -175,6 +220,35 @@ public class ProjectServiceImpl implements ProjectService {
         return clientRepository.findById(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Client not found with ID: " + clientId));
+    }
+
+    /**
+     * Rechecks the JWT username against MySQL before returning role-scoped
+     * Project data. This prevents an inactive account from using an older JWT.
+     */
+    private Users findCurrentUserWithRole(
+            String username,
+            String requiredRole,
+            String userLabel) {
+
+        Users user = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Logged-in user was not found"));
+
+        if (!requiredRole.equals(user.getRole())) {
+            throw new AccessDeniedException(
+                    "Only a " + userLabel
+                            + " can use this Project operation");
+        }
+
+        if (!ACTIVE_STATUS.equals(user.getAccountStatus())
+                || !APPROVED_STATUS.equals(user.getApprovalStatus())) {
+
+            throw new AccessDeniedException(
+                    userLabel + " account must be approved and active");
+        }
+
+        return user;
     }
 
     /**

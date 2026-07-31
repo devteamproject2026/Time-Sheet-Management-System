@@ -7,6 +7,7 @@ import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
 import com.tms.authservice.dto.LoginResponse;
 import com.tms.authservice.dto.RegisterHrRequest;
+import com.tms.authservice.dto.UserLookupResponse;
 import com.tms.authservice.entity.User;
 import com.tms.authservice.entity.enums.AccountStatus;
 import com.tms.authservice.entity.enums.ApprovalStatus;
@@ -25,6 +26,11 @@ public interface AuthService {
 
     // Restore the currently authenticated user's safe profile after a page refresh
     CurrentUserResponse getCurrentUser(String username);
+
+    // Safe lookup lists used by HR while creating Projects and assignments
+    List<UserLookupResponse> getActiveManagers();
+
+    List<UserLookupResponse> getActiveEmployees();
 
     // Pending HR Requests
     List<User> getPendingHrRequests();

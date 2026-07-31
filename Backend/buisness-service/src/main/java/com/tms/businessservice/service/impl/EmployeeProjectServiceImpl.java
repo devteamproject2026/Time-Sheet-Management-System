@@ -25,7 +25,6 @@ import com.tms.businessservice.service.EmployeeProjectService;
 @Service
 public class EmployeeProjectServiceImpl implements EmployeeProjectService {
 
-    private static final String ADMIN_ROLE = "ADMIN";
     private static final String HR_HEAD_ROLE = "HR_HEAD";
     private static final String MANAGER_ROLE = "MANAGER";
     private static final String EMPLOYEE_ROLE = "EMPLOYEE";
@@ -53,12 +52,11 @@ public class EmployeeProjectServiceImpl implements EmployeeProjectService {
             String actorUsername) {
 
         Users actor = findActiveUserByUsername(actorUsername);
+        // Only HR may change staffing. The controller checks the JWT role,
+        // and this service check provides a second layer of protection.
+        ensureHrHead(actor);
+
         Project project = findProjectOrThrow(request.getProjectId());
-
-        // ADMIN/HR can use any Project. A MANAGER can use only a Project whose
-        // manager_id matches that logged-in Manager's user ID.
-        ensureCanManageProject(actor, project);
-
         Users employee = findActiveEmployeeOrThrow(request.getEmployeeId());
 
         if (employeeProjectRepository
@@ -89,7 +87,7 @@ public class EmployeeProjectServiceImpl implements EmployeeProjectService {
             String actorUsername) {
 
         Users actor = findActiveUserByUsername(actorUsername);
-        ensureAdminOrHr(actor);
+        ensureHrHead(actor);
 
         return employeeProjectRepository.findAll()
                 .stream()
@@ -105,7 +103,7 @@ public class EmployeeProjectServiceImpl implements EmployeeProjectService {
 
         Users actor = findActiveUserByUsername(actorUsername);
         Project project = findProjectOrThrow(projectId);
-        ensureCanManageProject(actor, project);
+        ensureCanViewProjectTeam(actor, project);
 
         return employeeProjectRepository
                 .findByProject_ProjectIdOrderByAssignedDateDesc(projectId)
@@ -121,7 +119,7 @@ public class EmployeeProjectServiceImpl implements EmployeeProjectService {
             String actorUsername) {
 
         Users actor = findActiveUserByUsername(actorUsername);
-        ensureAdminOrHr(actor);
+        ensureHrHead(actor);
 
         // Return 404 for a missing ID and a clear 400 if it is not an Employee.
         Users employee = findActiveEmployeeOrThrow(employeeId);
@@ -161,22 +159,21 @@ public class EmployeeProjectServiceImpl implements EmployeeProjectService {
             String actorUsername) {
 
         Users actor = findActiveUserByUsername(actorUsername);
+        ensureHrHead(actor);
+
         EmployeeProject assignment =
                 findAssignmentOrThrow(employeeProjectId);
-
-        // A Manager may remove only assignments from their own Project.
-        ensureCanManageProject(actor, assignment.getProject());
 
         employeeProjectRepository.delete(assignment);
     }
 
     /**
-     * Allows system-wide operations for ADMIN/HR and Project-scoped operations
-     * for the Manager who actually owns that Project.
+     * HR may view any Project team. A Manager receives read-only access only
+     * when that Manager owns the requested Project.
      */
-    private void ensureCanManageProject(Users actor, Project project) {
+    private void ensureCanViewProjectTeam(Users actor, Project project) {
 
-        if (isAdminOrHr(actor)) {
+        if (HR_HEAD_ROLE.equals(actor.getRole())) {
             return;
         }
 
@@ -187,22 +184,21 @@ public class EmployeeProjectServiceImpl implements EmployeeProjectService {
 
         if (!isOwningManager) {
             throw new AccessDeniedException(
-                    "You can manage assignments only for your own Project");
+                    "A Manager can view assignments only for their own Project");
         }
     }
 
-    private void ensureAdminOrHr(Users actor) {
+    /**
+     * Assignment changes and company-wide assignment views belong to HR.
+     * ADMIN is intentionally excluded because technical administration does
+     * not require day-to-day staffing permissions.
+     */
+    private void ensureHrHead(Users actor) {
 
-        if (!isAdminOrHr(actor)) {
+        if (!HR_HEAD_ROLE.equals(actor.getRole())) {
             throw new AccessDeniedException(
-                    "Only Admin or HR Head can view all assignments");
+                    "Only HR Head can perform this assignment operation");
         }
-    }
-
-    private boolean isAdminOrHr(Users user) {
-
-        return ADMIN_ROLE.equals(user.getRole())
-                || HR_HEAD_ROLE.equals(user.getRole());
     }
 
     private Users findActiveEmployeeOrThrow(Integer employeeId) {

@@ -28,9 +28,10 @@ import jakarta.validation.Valid;
  * These endpoints are intentionally kept thin: the controller handles HTTP,
  * while ClientService contains the business and database logic.
  *
- * ADMIN and HR_HEAD can create, read and update Clients. Permanent deletion is
- * limited to ADMIN because it is the highest-risk operation. MANAGER and
- * EMPLOYEE do not need direct Client access in the current project flow.
+ * HR_HEAD performs normal Client creation and updates. ADMIN and HR_HEAD can
+ * read Client records, while permanent deletion is limited to ADMIN because it
+ * is the highest-risk operation. MANAGER and EMPLOYEE do not need direct
+ * Client-management access in the current project flow.
  */
 @RestController
 @RequestMapping("/api/business/clients")
@@ -47,9 +48,12 @@ public class ClientController {
      *
      * Creates one new Client from a JSON request body.
      * Returns HTTP 201 Created with the saved Client and generated ID.
-     * Allowed roles: ADMIN and HR_HEAD.
+     * Allowed role: HR_HEAD only.
+     *
+     * Client creation is a normal HR business operation. ADMIN supervises and
+     * audits the system instead of entering daily Client data.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @PostMapping
     public ResponseEntity<ClientResponse> createClient(
             @Valid @RequestBody ClientRequest request) {
@@ -66,6 +70,9 @@ public class ClientController {
      *
      * Returns every Client currently stored in the clients table.
      * Allowed roles: ADMIN and HR_HEAD.
+     *
+     * HR uses the list for daily work, while ADMIN has read-only access for
+     * supervision and auditing.
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
     @GetMapping
@@ -80,6 +87,9 @@ public class ClientController {
      * Returns one Client using its numeric ID.
      * Returns HTTP 404 when the ID does not exist.
      * Allowed roles: ADMIN and HR_HEAD.
+     *
+     * HR uses this for daily work, while ADMIN has read-only access for
+     * supervision and auditing.
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
     @GetMapping("/{clientId}")
@@ -94,9 +104,12 @@ public class ClientController {
      *
      * Replaces the editable details of an existing Client.
      * Returns the updated Client or HTTP 404 when the ID does not exist.
-     * Allowed roles: ADMIN and HR_HEAD.
+     * Allowed role: HR_HEAD only.
+     *
+     * HR maintains Client business details. ADMIN retains read access for
+     * supervision but cannot change normal Client information.
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_HEAD')")
+    @PreAuthorize("hasRole('HR_HEAD')")
     @PutMapping("/{clientId}")
     public ResponseEntity<ClientResponse> updateClient(
             @PathVariable Integer clientId,
