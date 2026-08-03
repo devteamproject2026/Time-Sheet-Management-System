@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,8 +26,9 @@ import jakarta.validation.Valid;
  * Base URL: /api/business/projects
  *
  * HR_HEAD creates and updates normal Project business data. ADMIN and HR_HEAD
- * can read all Projects, while ADMIN alone may permanently delete one. MANAGER
- * and EMPLOYEE receive separate APIs that return only their own Projects.
+ * can read all Projects. Permanent deletion is intentionally not exposed by
+ * the current requirements. MANAGER and EMPLOYEE receive separate APIs that
+ * return only their own Projects.
  */
 @RestController
 @RequestMapping("/api/business/projects")
@@ -154,20 +154,4 @@ public class ProjectController {
                 projectService.updateProject(projectId, request));
     }
 
-    /**
-     * DELETE /api/business/projects/{projectId}
-     *
-     * Permanently deletes one Project and returns HTTP 204 No Content.
-     *
-     * Allowed role: ADMIN only. HR_HEAD can update a Project to ON_HOLD or
-     * COMPLETED instead of permanently removing historical business data.
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{projectId}")
-    public ResponseEntity<Void> deleteProject(
-            @PathVariable Integer projectId) {
-
-        projectService.deleteProject(projectId);
-        return ResponseEntity.noContent().build();
-    }
 }

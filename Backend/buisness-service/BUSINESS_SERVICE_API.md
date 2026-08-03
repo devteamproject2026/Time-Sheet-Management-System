@@ -18,7 +18,7 @@ listed below.
 
 | Role | Business responsibility |
 |---|---|
-| `ADMIN` | Read Client/Project data and permanently delete Client/Project records |
+| `ADMIN` | Read Client and Project data for supervision |
 | `HR_HEAD` | Create/update Clients and Projects and manage employee assignments |
 | `MANAGER` | View Projects they manage and view their own Project teams |
 | `EMPLOYEE` | View Projects assigned to them |
@@ -61,7 +61,6 @@ Base endpoint: `/api/business/clients`
 | GET | `/clients` | View all Clients | `ADMIN`, `HR_HEAD` | `200` |
 | GET | `/clients/{clientId}` | View one Client | `ADMIN`, `HR_HEAD` | `200` |
 | PUT | `/clients/{clientId}` | Update a Client | `HR_HEAD` | `200` |
-| DELETE | `/clients/{clientId}` | Permanently delete a Client | `ADMIN` | `204` |
 
 POST and PUT request:
 
@@ -99,7 +98,6 @@ Base endpoint: `/api/business/projects`
 | GET | `/projects` | View all Projects | `ADMIN`, `HR_HEAD` | `200` |
 | GET | `/projects/{projectId}` | View one Project | `ADMIN`, `HR_HEAD` | `200` |
 | PUT | `/projects/{projectId}` | Update a Project | `HR_HEAD` | `200` |
-| DELETE | `/projects/{projectId}` | Permanently delete a Project | `ADMIN` | `204` |
 | GET | `/projects/my-managed-projects` | View logged-in Manager's Projects | `MANAGER` | `200` |
 | GET | `/projects/my-assigned-projects` | View logged-in Employee's Projects | `EMPLOYEE` | `200` |
 
@@ -234,4 +232,3 @@ override these settings:
 | `BUSINESS_SERVICE_PORT` | Business Service port |
 
 Auth and Business services must receive exactly the same `JWT_SECRET`.
-

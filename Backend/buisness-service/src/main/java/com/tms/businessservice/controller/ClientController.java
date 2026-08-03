@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,9 +28,9 @@ import jakarta.validation.Valid;
  * while ClientService contains the business and database logic.
  *
  * HR_HEAD performs normal Client creation and updates. ADMIN and HR_HEAD can
- * read Client records, while permanent deletion is limited to ADMIN because it
- * is the highest-risk operation. MANAGER and EMPLOYEE do not need direct
- * Client-management access in the current project flow.
+ * read Client records. Permanent deletion is intentionally not exposed by the
+ * current requirements. MANAGER and EMPLOYEE do not need direct Client-
+ * management access in the current project flow.
  */
 @RestController
 @RequestMapping("/api/business/clients")
@@ -119,22 +118,4 @@ public class ClientController {
                 clientService.updateClient(clientId, request));
     }
 
-    /**
-     * DELETE /api/business/clients/{clientId}
-     *
-     * Deletes one existing Client.
-     * Returns HTTP 204 No Content after successful deletion.
-     * Allowed role: ADMIN only.
-     *
-     * Deleting a Client can affect related Projects, so HR_HEAD is deliberately
-     * not allowed to perform this permanent operation.
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{clientId}")
-    public ResponseEntity<Void> deleteClient(
-            @PathVariable Integer clientId) {
-
-        clientService.deleteClient(clientId);
-        return ResponseEntity.noContent().build();
-    }
 }

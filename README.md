@@ -159,12 +159,10 @@ Business Service owns organizational/master data:
 | GET | `/api/business/clients` | `ADMIN`, `HR_HEAD` |
 | GET | `/api/business/clients/{clientId}` | `ADMIN`, `HR_HEAD` |
 | PUT | `/api/business/clients/{clientId}` | `HR_HEAD` |
-| DELETE | `/api/business/clients/{clientId}` | `ADMIN` |
 | POST | `/api/business/projects` | `HR_HEAD` |
 | GET | `/api/business/projects` | `ADMIN`, `HR_HEAD` |
 | GET | `/api/business/projects/{projectId}` | `ADMIN`, `HR_HEAD` |
 | PUT | `/api/business/projects/{projectId}` | `HR_HEAD` |
-| DELETE | `/api/business/projects/{projectId}` | `ADMIN` |
 | GET | `/api/business/projects/my-managed-projects` | `MANAGER` |
 | GET | `/api/business/projects/my-assigned-projects` | `EMPLOYEE` |
 | POST | `/api/business/employee-projects` | `HR_HEAD` |

@@ -183,15 +183,6 @@ public class ProjectServiceImpl implements ProjectService {
         return toResponse(updatedProject);
     }
 
-    @Override
-    @Transactional
-    public void deleteProject(Integer projectId) {
-
-        // Finding first produces a clear 404 when the ID does not exist.
-        Project project = findProjectOrThrow(projectId);
-        projectRepository.delete(project);
-    }
-
     /**
      * The end date cannot be earlier than the start date.
      *
