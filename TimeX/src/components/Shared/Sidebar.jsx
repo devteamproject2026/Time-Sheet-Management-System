@@ -16,7 +16,7 @@ export default function Sidebar() {
       case "ADMIN":
         return [
           ...baseItems,
-          { label: "Companies", path: "/companies", icon: "building" },
+          { label: "Clients", path: "/companies", icon: "building" },
           { label: "Projects", path: "/projects", icon: "diagram-3" },
           { label: "Users", path: "/users", icon: "people" },
           { label: "Pending HR", path: "/pending-hr", icon: "hourglass" },
@@ -26,8 +26,9 @@ export default function Sidebar() {
       case "HR_HEAD":
         return [
           ...baseItems,
+          { label: "Clients", path: "/clients", icon: "building" },
           { label: "Projects", path: "/projects", icon: "diagram-3" },
-          { label: "Employees", path: "/employees", icon: "person-check" },
+          { label: "Assignments", path: "/employees", icon: "person-check" },
           { label: "Timesheets", path: "/timesheets", icon: "clock" },
           { label: "Create Manager", path: "/create-manager", icon: "person-plus" },
           { label: "Create Employee", path: "/create-employee", icon: "person-plus" },

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { AUTH_API_URL } from "../../config/api";
+import { readApiError } from "../../utils/apiError";
 import "./HrRegistration.css";
 
 export default function HrRegistration() {
@@ -15,6 +17,7 @@ export default function HrRegistration() {
   });
 
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -23,33 +26,36 @@ export default function HrRegistration() {
     });
   };
 
-  const handleSubmit = (e) => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:8081/api/auth/register-hr", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include",
-      body: JSON.stringify(formData)
-    })
-      .then(async (resp) => {
+    setLoading(true);
+    setMsg("");
 
-        const message = await resp.text();
-
-        if (resp.status === 201) {
-          setMsg(message);
-        } else {
-          setMsg(message);
-        }
-
-      })
-      .catch((err) => {
-        console.log(err);
-        setMsg("Something Went Wrong");
+    try {
+      const response = await fetch(`${AUTH_API_URL}/register-hr`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(formData)
       });
+
+      if (!response.ok) {
+        setMsg(
+          await readApiError(response, "Unable to submit the HR request.")
+        );
+        return;
+      }
+
+      setMsg((await response.text()) || "HR request submitted successfully.");
+    } catch (err) {
+      console.error(err);
+      setMsg("Cannot connect to the Auth Service. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -209,8 +215,8 @@ export default function HrRegistration() {
               />
             </div>
 
-            <button className="register-button" type="submit">
-              Submit Request
+            <button className="register-button" type="submit" disabled={loading}>
+              {loading ? "Submitting..." : "Submit Request"}
             </button>
 
           </form>

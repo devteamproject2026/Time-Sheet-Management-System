@@ -1,85 +1,117 @@
 import { useEffect, useState } from "react";
+import { AUTH_API_URL } from "../../config/api";
+import { readApiError } from "../../utils/apiError";
 
 export default function PendingHrRequests() {
   const [hrs, setHrs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
+  const [processingId, setProcessingId] = useState(null);
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
+  const [requestVersion, setRequestVersion] = useState(0);
 
+  // The request function lives inside the effect, so it cannot be referenced
+  // before declaration. State changes occur after the asynchronous request.
   useEffect(() => {
+    let cancelled = false;
+
+    const loadPendingHRs = async () => {
+      try {
+        const response = await fetch(`${AUTH_API_URL}/pending-hr`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            await readApiError(response, "Unable to load pending HR requests.")
+          );
+        }
+
+        const data = await response.json();
+        if (!cancelled) setHrs(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+
+        if (!cancelled) {
+          setHrs([]);
+          setFeedback({
+            type: "error",
+            message:
+              err.message ||
+              "Cannot connect to the Auth Service. Please try again.",
+          });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
     loadPendingHRs();
-  }, []);
 
-  const loadPendingHRs = () => {
+    return () => {
+      cancelled = true;
+    };
+  }, [requestVersion]);
+
+  // A retry starts from a user action, so it is the correct place to update
+  // loading state before making the next request.
+  const retryPendingHRs = () => {
     setLoading(true);
-
-    fetch("http://localhost:8081/api/auth/pending-hr", {
-      method: "GET",
-      credentials: "include",
-    })
-      .then(async (resp) => {
-        if (!resp.ok) {
-          throw new Error("Failed to load pending HR requests.");
-        }
-
-        return await resp.json();
-      })
-      .then((data) => {
-        setHrs(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-        setMessage("Unable to fetch pending requests.");
-      });
+    setFeedback({ type: "", message: "" });
+    setRequestVersion((currentVersion) => currentVersion + 1);
   };
 
-  const approveHr = (id) => {
-    if (!window.confirm("Approve this HR request?")) return;
+  // Approval and rejection use the same backend workflow. The action value
+  // chooses the correct endpoint while keeping loading and error handling equal.
+  const updateHrStatus = async (id, action) => {
+    const actionLabel = action === "approve" ? "approve" : "reject";
+    if (!window.confirm(`${actionLabel} this HR request?`)) return;
 
-    fetch(`http://localhost:8081/api/auth/approve-hr/${id}`, {
-      method: "PUT",
-      credentials: "include",
-    })
-      .then(async (resp) => {
-        if (!resp.ok) {
-          throw new Error("Unable to approve HR.");
+    setProcessingId(id);
+    setFeedback({ type: "", message: "" });
+
+    try {
+      const response = await fetch(
+        `${AUTH_API_URL}/${actionLabel}-hr/${id}`,
+        {
+          method: "PUT",
+          credentials: "include",
         }
+      );
 
-        setHrs((prev) => prev.filter((hr) => hr.userId !== id));
-        setMessage("HR approved successfully.");
-      })
-      .catch((err) => {
-        console.error(err);
-        setMessage("Unable to approve HR.");
+      if (!response.ok) {
+        throw new Error(
+          await readApiError(
+            response,
+            `Unable to ${actionLabel} the HR request.`
+          )
+        );
+      }
+
+      setHrs((previousHrs) =>
+        previousHrs.filter((hr) => hr.userId !== id)
+      );
+      setFeedback({
+        type: "success",
+        message: `HR ${
+          actionLabel === "approve" ? "approved" : "rejected"
+        } successfully.`,
       });
-  };
-
-  const rejectHr = (id) => {
-    if (!window.confirm("Reject this HR request?")) return;
-
-    fetch(`http://localhost:8081/api/auth/reject-hr/${id}`, {
-      method: "PUT",
-      credentials: "include",
-    })
-      .then(async (resp) => {
-        if (!resp.ok) {
-          throw new Error("Unable to reject HR.");
-        }
-
-        setHrs((prev) => prev.filter((hr) => hr.userId !== id));
-        setMessage("HR rejected successfully.");
-      })
-      .catch((err) => {
-        console.error(err);
-        setMessage("Unable to reject HR.");
+    } catch (err) {
+      console.error(err);
+      setFeedback({
+        type: "error",
+        message:
+          err.message || `Unable to ${actionLabel} the HR request.`,
       });
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   return (
     <div className="container mt-4">
       <div className="card shadow-lg border-0">
-
         <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
           <h3 className="mb-0">Pending HR Requests</h3>
 
@@ -89,10 +121,15 @@ export default function PendingHrRequests() {
         </div>
 
         <div className="card-body">
-
-          {message && (
-            <div className="alert alert-info">
-              {message}
+          {feedback.message && (
+            <div
+              className={`alert ${
+                feedback.type === "error" ? "alert-danger" : "alert-success"
+              }`}
+              role="alert"
+              aria-live="polite"
+            >
+              {feedback.message}
             </div>
           )}
 
@@ -101,17 +138,27 @@ export default function PendingHrRequests() {
               <div
                 className="spinner-border text-primary"
                 role="status"
+                aria-label="Loading pending HR requests"
               ></div>
 
-              <p className="mt-3">Loading...</p>
+              <p className="mt-3">Loading pending HR requests...</p>
             </div>
           ) : hrs.length === 0 ? (
-            <div className="alert alert-info text-center">
-              No pending HR requests.
+            <div className="text-center">
+              <div className="alert alert-info">No pending HR requests.</div>
+
+              {feedback.type === "error" && (
+                <button
+                  className="btn btn-outline-primary"
+                  type="button"
+                  onClick={retryPendingHRs}
+                >
+                  Try Again
+                </button>
+              )}
             </div>
           ) : (
             <table className="table table-hover table-bordered align-middle">
-
               <thead className="table-dark">
                 <tr>
                   <th>ID</th>
@@ -123,42 +170,42 @@ export default function PendingHrRequests() {
               </thead>
 
               <tbody>
-
                 {hrs.map((hr) => (
                   <tr key={hr.userId}>
-
                     <td>{hr.userId}</td>
-
                     <td>{hr.username}</td>
-
                     <td>{hr.email}</td>
 
                     <td className="text-center">
                       <button
                         className="btn btn-success btn-sm"
-                        onClick={() => approveHr(hr.userId)}
+                        type="button"
+                        onClick={() => updateHrStatus(hr.userId, "approve")}
+                        disabled={processingId !== null}
                       >
-                        ✔ Approve
+                        {processingId === hr.userId
+                          ? "Processing..."
+                          : "Approve"}
                       </button>
                     </td>
 
                     <td className="text-center">
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() => rejectHr(hr.userId)}
+                        type="button"
+                        onClick={() => updateHrStatus(hr.userId, "reject")}
+                        disabled={processingId !== null}
                       >
-                        ✖ Reject
+                        {processingId === hr.userId
+                          ? "Processing..."
+                          : "Reject"}
                       </button>
                     </td>
-
                   </tr>
                 ))}
-
               </tbody>
-
             </table>
           )}
-
         </div>
       </div>
     </div>

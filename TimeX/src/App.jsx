@@ -2,9 +2,11 @@ import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { finishSessionCheck, restoreSession } from "./redux/authslice";
+import { AUTH_API_URL } from "./config/api";
 
 // Layouts
 import ProtectedLayout from "./components/Shared/ProtectedLayout";
+import ModulePlaceholder from "./components/Shared/ModulePlaceholder";
 
 // Public Pages
 import HomeComp from "./components/HomeComp";
@@ -16,20 +18,20 @@ import HrRegistration from "./components/HR-Head/HrRegistration";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Admin Pages
-import AdminDashboard from "./components/Admin/AdminDashboard";
 import PendingHrRequests from "./components/Admin/PendingHrRequests";
 
 // HR Pages
-import HrDashboard from "./components/HR-Head/HrDashboard";
 import CreateEmployee from "./components/HR-Head/CreateEmployee";
 import CreateManager from "./components/HR-Head/CreateManager";
 
-// Manager Pages
-import ManagerDashboard from "./components/Manager/ManagerDashboard";
-
-// Employee Pages
-import EmployeeDashboard from "./components/Employee/EmployeeDashboard";
 import ChangePassword from "./components/Shared/ChangePassword";
+
+// Business Service Pages
+import ClientsPage from "./components/Business/ClientsPage";
+import ProjectsPage from "./components/Business/ProjectsPage";
+import AssignmentsPage from "./components/Business/AssignmentsPage";
+import ManagerTeamPage from "./components/Business/ManagerTeamPage";
+import BusinessDashboard from "./components/Business/BusinessDashboard";
 
 // import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -53,7 +55,7 @@ function App() {
     if (sessionCheckStarted.current) return;
     sessionCheckStarted.current = true;
 
-    fetch("http://localhost:8081/api/auth/me", {
+    fetch(`${AUTH_API_URL}/me`, {
       method: "GET",
       // The JWT is stored in an HttpOnly cookie, so the browser must include it.
       credentials: "include",
@@ -110,7 +112,7 @@ function App() {
             path="/admin"
             element={
               <ProtectedRoute role="ADMIN">
-                <AdminDashboard />
+                <BusinessDashboard />
               </ProtectedRoute>
             }
           />
@@ -122,13 +124,51 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/companies"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <ClientsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/projects"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <ProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <ModulePlaceholder
+                  title="HR Heads"
+                  description="The Admin HR Head directory will be implemented here after its safe Auth API is available."
+                />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/analytics"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <ModulePlaceholder
+                  title="Analytics"
+                  description="Administrative reporting and analytics will be implemented in a later module."
+                />
+              </ProtectedRoute>
+            }
+          />
 
           {/* HR Routes */}
           <Route
             path="/hr"
             element={
               <ProtectedRoute role="HR_HEAD">
-                <HrDashboard />
+                <BusinessDashboard />
               </ProtectedRoute>
             }
           />
@@ -148,13 +188,86 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/hr/clients"
+            element={
+              <ProtectedRoute role="HR_HEAD">
+                <ClientsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/projects"
+            element={
+              <ProtectedRoute role="HR_HEAD">
+                <ProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/employees"
+            element={
+              <ProtectedRoute role="HR_HEAD">
+                <AssignmentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/timesheets"
+            element={
+              <ProtectedRoute role="HR_HEAD">
+                <ModulePlaceholder
+                  title="Timesheets"
+                  description="This page depends on the future Transaction Service timesheet module."
+                />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Manager Routes */}
           <Route
             path="/manager"
             element={
               <ProtectedRoute role="MANAGER">
-                <ManagerDashboard />
+                <BusinessDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/projects"
+            element={
+              <ProtectedRoute role="MANAGER">
+                <ProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/tasks"
+            element={
+              <ProtectedRoute role="MANAGER">
+                <ModulePlaceholder
+                  title="Task Management"
+                  description="This page depends on the future Transaction Service task module."
+                />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/team"
+            element={
+              <ProtectedRoute role="MANAGER">
+                <ManagerTeamPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/timesheets"
+            element={
+              <ProtectedRoute role="MANAGER">
+                <ModulePlaceholder
+                  title="Team Timesheets"
+                  description="This page depends on the future Transaction Service approval workflow."
+                />
               </ProtectedRoute>
             }
           />
@@ -164,7 +277,37 @@ function App() {
             path="/employee"
             element={
               <ProtectedRoute role="EMPLOYEE">
-                <EmployeeDashboard />
+                <BusinessDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/projects"
+            element={
+              <ProtectedRoute role="EMPLOYEE">
+                <ProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/tasks"
+            element={
+              <ProtectedRoute role="EMPLOYEE">
+                <ModulePlaceholder
+                  title="My Tasks"
+                  description="This page depends on the future Transaction Service task module."
+                />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/timesheets"
+            element={
+              <ProtectedRoute role="EMPLOYEE">
+                <ModulePlaceholder
+                  title="My Timesheets"
+                  description="This page depends on the future Transaction Service timesheet module."
+                />
               </ProtectedRoute>
             }
           />
@@ -183,6 +326,16 @@ function App() {
         </Route>
 
         
+
+        <Route
+          path="/unauthorized"
+          element={
+            <div className="container mt-5 text-center">
+              <h1>Access Denied</h1>
+              <p>You are logged in, but your role cannot open this page.</p>
+            </div>
+          }
+        />
 
         {/* Catch all - 404 */}
         <Route path="*" element={<div className="container mt-5"><h1>Page Not Found</h1></div>} />
