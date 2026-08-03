@@ -26,6 +26,4 @@ public interface ProjectService {
     ProjectResponse updateProject(
             Integer projectId,
             ProjectRequest request);
-
-    void deleteProject(Integer projectId);
 }

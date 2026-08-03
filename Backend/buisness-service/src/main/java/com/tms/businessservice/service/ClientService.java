@@ -20,6 +20,4 @@ public interface ClientService {
     ClientResponse getClientById(Integer clientId);
 
     ClientResponse updateClient(Integer clientId, ClientRequest request);
-
-    void deleteClient(Integer clientId);
 }

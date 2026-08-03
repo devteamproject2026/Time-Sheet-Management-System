@@ -78,16 +78,6 @@ public class ClientServiceImpl implements ClientService {
         return toResponse(updatedClient);
     }
 
-    @Override
-    @Transactional
-    public void deleteClient(Integer clientId) {
-
-        // Finding first allows the API to return a clear 404 later instead of
-        // silently succeeding when the requested Client does not exist.
-        Client client = findClientOrThrow(clientId);
-        clientRepository.delete(client);
-    }
-
     /**
      * Loads one Client or throws a reusable exception when the ID is invalid.
      */
