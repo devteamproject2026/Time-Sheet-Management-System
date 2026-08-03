@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { AUTH_API_URL } from "../../config/api";
+import { readApiError } from "../../utils/apiError";
 import "./HrUserForm.css";
 
 export default function CreateManager() {
@@ -14,6 +16,7 @@ export default function CreateManager() {
   });
 
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,40 +25,43 @@ export default function CreateManager() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:8081/api/auth/register-manager", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then(async (resp) => {
-        const message = await resp.text();
+    setLoading(true);
+    setMsg("");
 
-        if (resp.ok) {
-          setMsg(message);
-
-          setFormData({
-            username: "",
-            password: "",
-            firstName: "",
-            lastName: "",
-            email: "",
-            contact: "",
-            joiningDate: "",
-          });
-        } else {
-          setMsg(message);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setMsg("Something Went Wrong");
+    try {
+      const response = await fetch(`${AUTH_API_URL}/register-manager`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
+
+      if (!response.ok) {
+        setMsg(await readApiError(response, "Unable to create the manager."));
+        return;
+      }
+
+      setMsg((await response.text()) || "Manager created successfully.");
+      setFormData({
+        username: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        contact: "",
+        joiningDate: "",
+      });
+    } catch (err) {
+      console.error(err);
+      setMsg("Cannot connect to the Auth Service. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -188,8 +194,8 @@ export default function CreateManager() {
 
           </div>
 
-          <button className="hr-user-submit" type="submit">
-            Create Manager
+          <button className="hr-user-submit" type="submit" disabled={loading}>
+            {loading ? "Creating..." : "Create Manager"}
           </button>
 
           {msg && (

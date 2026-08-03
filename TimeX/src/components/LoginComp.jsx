@@ -2,79 +2,77 @@ import { useState } from "react";
 import { login } from "../redux/authslice";
 import { useDispatch } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
+import { AUTH_API_URL } from "../config/api";
+import { readApiError } from "../utils/apiError";
 import "./LoginComp.css";
 
 export default function LoginComp() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handelSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:8081/api/auth/login", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    })
-      .then(async (resp) => {
-        if (resp.ok) {
-          return await resp.json();
-        }
+    setLoading(true);
+    setMsg("");
 
-        const error = await resp.json();
-
-        setMsg(error.message || "Invalid Username or Password");
-        return null;
-      })
-      .then((data) => {
-        if (!data) return;
-
-        dispatch(
-          login({
-            user: {
-              userId: data.userId,
-              username: data.username,
-              role: data.role,
-            },
-            token: data.token,
-          })
-        );
-
-        switch (data.role) {
-          case "ADMIN":
-            navigate("/admin");
-            break;
-
-          case "HR_HEAD":
-            navigate("/hr");
-            break;
-
-          case "MANAGER":
-            navigate("/manager");
-            break;
-
-          case "EMPLOYEE":
-            navigate("/employee");
-            break;
-
-          default:
-            navigate("/");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setMsg("Something went wrong");
+    try {
+      const response = await fetch(`${AUTH_API_URL}/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       });
+
+      if (!response.ok) {
+        setMsg(
+          await readApiError(response, "Invalid username or password.")
+        );
+        return;
+      }
+
+      const data = await response.json();
+
+      dispatch(
+        login({
+          user: {
+            userId: data.userId,
+            username: data.username,
+            role: data.role,
+          },
+          token: data.token,
+        })
+      );
+
+      switch (data.role) {
+        case "ADMIN":
+          navigate("/admin");
+          break;
+        case "HR_HEAD":
+          navigate("/hr");
+          break;
+        case "MANAGER":
+          navigate("/manager");
+          break;
+        case "EMPLOYEE":
+          navigate("/employee");
+          break;
+        default:
+          navigate("/");
+      }
+    } catch (err) {
+      console.error(err);
+      setMsg("Cannot connect to the Auth Service. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,7 +104,7 @@ export default function LoginComp() {
             <h2>Sign in to your account</h2>
           </div>
 
-          <form className="login-form" onSubmit={handelSubmit}>
+          <form className="login-form" onSubmit={handleSubmit}>
 
             <div className="form-field">
               <label htmlFor="username">Username</label>
@@ -136,8 +134,8 @@ export default function LoginComp() {
               />
             </div>
 
-            <button className="login-button" type="submit">
-              Sign In
+            <button className="login-button" type="submit" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
             </button>
 
           </form>

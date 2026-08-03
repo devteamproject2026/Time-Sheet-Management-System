@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AUTH_API_URL } from "../../config/api";
+import { readApiError } from "../../utils/apiError";
 import "./ChangePassword.css";
 
 export default function ChangePassword() {
@@ -35,7 +37,7 @@ export default function ChangePassword() {
 
     try {
       const response = await fetch(
-        "http://localhost:8081/api/auth/change-password",
+        `${AUTH_API_URL}/change-password`,
         {
           method: "POST",
           credentials: "include",
@@ -46,9 +48,8 @@ export default function ChangePassword() {
         }
       );
 
-      const data = await response.text();
-
       if (response.ok) {
+        const data = await response.text();
         setMessage(data);
 
         setFormData({
@@ -61,7 +62,9 @@ export default function ChangePassword() {
           navigate(-1);
         }, 1500);
       } else {
-        setError(data);
+        setError(
+          await readApiError(response, "Unable to change the password.")
+        );
       }
     } catch (err) {
       console.error(err);

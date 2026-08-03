@@ -13,7 +13,7 @@ for each role. Roles decide **who can use an operation**, while modules define
 
 | Area | Status | Included features |
 |---|---|---|
-| React frontend | In progress | Login, HR registration, session restoration, protected routes, role dashboards, HR Manager/Employee registration forms |
+| React frontend | Business modules implemented | Authentication pages, protected role dashboards, Client management, Project management and Employee-Project assignments |
 | Auth Service | Implemented | Registration, approval, login, logout, BCrypt passwords, JWT cookie, role security, active user lookups |
 | Business Service | Implemented | Client CRUD, Project CRUD, Manager/Employee scoped Project views, Employee-Project assignments, validation and API errors |
 | Transaction Service | Planned | Tasks, attendance, timesheets, approvals and complaints |
@@ -403,6 +403,7 @@ Open a third terminal:
 ```bash
 cd TimeX
 npm ci
+cp .env.example .env
 npm run dev
 ```
 
