@@ -32,19 +32,29 @@ const dashboardConfiguration = {
   MANAGER: {
     kicker: "Manager Workspace",
     title: "Manager Dashboard",
-    description: "Monitor the Projects and Project teams assigned to your Manager account.",
+    description: "Manage Projects, Tasks, Timesheet approvals and daily team activity.",
     requests: ["/projects/my-managed-projects"],
     actions: [
       ["My Projects", "/manager/projects"],
       ["My Project Teams", "/manager/team"],
+      ["Manage Tasks", "/manager/tasks"],
+      ["Review Timesheets", "/manager/timesheets"],
+      ["Team Attendance", "/manager/attendance"],
+      ["Employee Reports", "/manager/reports"],
     ],
   },
   EMPLOYEE: {
     kicker: "Employee Workspace",
     title: "Employee Dashboard",
-    description: "Review the Projects currently assigned to your Employee account.",
+    description: "Complete assigned Tasks, submit Timesheets and record daily activity.",
     requests: ["/projects/my-assigned-projects"],
-    actions: [["My Assigned Projects", "/employee/projects"]],
+    actions: [
+      ["My Assigned Projects", "/employee/projects"],
+      ["My Tasks", "/employee/tasks"],
+      ["Submit Timesheet", "/employee/timesheets"],
+      ["My Attendance", "/employee/attendance"],
+      ["Raise Complaint", "/employee/complaints"],
+    ],
   },
 };
 

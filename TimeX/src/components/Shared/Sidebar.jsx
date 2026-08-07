@@ -29,7 +29,6 @@ export default function Sidebar() {
           { label: "Clients", path: "/clients", icon: "building" },
           { label: "Projects", path: "/projects", icon: "diagram-3" },
           { label: "Assignments", path: "/employees", icon: "person-check" },
-          { label: "Timesheets", path: "/timesheets", icon: "clock" },
           { label: "Create Manager", path: "/create-manager", icon: "person-plus" },
           { label: "Create Employee", path: "/create-employee", icon: "person-plus" },
         ];
@@ -41,6 +40,9 @@ export default function Sidebar() {
           { label: "Tasks", path: "/tasks", icon: "list-check" },
           { label: "Team", path: "/team", icon: "people" },
           { label: "Timesheets", path: "/timesheets", icon: "clock" },
+          { label: "Attendance", path: "/attendance", icon: "calendar-check" },
+          { label: "Complaints", path: "/complaints", icon: "chat-left-text" },
+          { label: "Reports", path: "/reports", icon: "bar-chart" },
         ];
 
       case "EMPLOYEE":
@@ -49,6 +51,8 @@ export default function Sidebar() {
           { label: "My Projects", path: "/projects", icon: "diagram-3" },
           { label: "My Tasks", path: "/tasks", icon: "list-check" },
           { label: "My Timesheets", path: "/timesheets", icon: "clock" },
+          { label: "Attendance", path: "/attendance", icon: "calendar-check" },
+          { label: "Complaints", path: "/complaints", icon: "chat-left-text" },
         ];
 
       default:

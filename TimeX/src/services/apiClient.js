@@ -1,4 +1,8 @@
-import { AUTH_API_URL, BUSINESS_API_URL } from "../config/api";
+import {
+  AUTH_API_URL,
+  BUSINESS_API_URL,
+  TRANSACTION_API_URL,
+} from "../config/api";
 import { readApiError } from "../utils/apiError";
 
 async function request(baseUrl, path, options = {}) {
@@ -37,3 +41,7 @@ export const businessApi = (path, options) =>
 
 export const authApi = (path, options) =>
   request(AUTH_API_URL, path, options);
+
+// Transaction Service uses the same HttpOnly JWT cookie as the other services.
+export const transactionApi = (path, options) =>
+  request(TRANSACTION_API_URL, path, options);

@@ -17,4 +17,7 @@ public class ProjectReference {
     
     @Column(name = "manager_id") 
     private Integer managerId;
+
+    @Column(name = "status")
+    private String status;
 }

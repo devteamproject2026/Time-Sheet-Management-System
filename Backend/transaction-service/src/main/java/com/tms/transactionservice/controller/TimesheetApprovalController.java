@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import com.tms.transactionservice.dto.ReviewTimesheetRequest;
-import com.tms.transactionservice.entity.Timesheet;
+import com.tms.transactionservice.dto.response.TimesheetResponse;
 import com.tms.transactionservice.service.TimesheetApprovalService;
 
 /** API for timesheet_approvals: a manager review creates an audit record. */
@@ -22,7 +22,7 @@ public class TimesheetApprovalController {
 
     @PostMapping("/timesheet/{timesheetId}") 
     @PreAuthorize("hasRole('MANAGER')")
-    Timesheet review(Authentication authentication, @PathVariable Integer timesheetId, @Valid @RequestBody ReviewTimesheetRequest request) {
+    public TimesheetResponse review(Authentication authentication, @PathVariable Integer timesheetId, @Valid @RequestBody ReviewTimesheetRequest request) {
        
     	return service.reviewTimesheet(authentication.getName(), timesheetId, request);
     }

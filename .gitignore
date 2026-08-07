@@ -18,6 +18,13 @@ dist/
 **/ .metadata/
 RemoteSystemsTempFiles/
 *.STS_VERSION
+.classpath
+.factorypath
+.project
+.settings/
+
+# Maven build output
+target/
 
 # Mac
 .DS_Store

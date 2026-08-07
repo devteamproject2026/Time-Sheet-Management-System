@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import com.tms.transactionservice.dto.SubmitTimesheetRequest;
-import com.tms.transactionservice.entity.Timesheet;
+import com.tms.transactionservice.dto.response.TimesheetResponse;
 import com.tms.transactionservice.service.TimesheetService;
 
 /** APIs for the timesheets table: employee submission, history, and team view. */
@@ -22,21 +22,21 @@ public class TimesheetController {
 
     @PostMapping
     @PreAuthorize("hasRole('EMPLOYEE')")
-    ResponseEntity<Timesheet> submit(Authentication authentication, @Valid @RequestBody SubmitTimesheetRequest request) {
+    public ResponseEntity<TimesheetResponse> submit(Authentication authentication, @Valid @RequestBody SubmitTimesheetRequest request) {
        
     	return ResponseEntity.status(HttpStatus.CREATED).body(service.submitTimesheet(authentication.getName(), request));
     }
 
     @GetMapping("/my") 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    List<Timesheet> myHistory(Authentication authentication) { 
+    public List<TimesheetResponse> myHistory(Authentication authentication) {
     	
     	return service.myTimesheets(authentication.getName()); 
     }
 
     @GetMapping("/review") 
     @PreAuthorize("hasRole('MANAGER')")
-    List<Timesheet> teamTimesheets(Authentication authentication) { 
+    public List<TimesheetResponse> teamTimesheets(Authentication authentication) {
     	
     	return service.timesheetsForManager(authentication.getName()); 
     }

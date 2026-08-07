@@ -1,11 +1,11 @@
-// API addresses come from Vite environment variables instead of being repeated
-// in every component. This lets us change an address in one place.
+// React communicates only with API Gateway. The Gateway then discovers and
+// forwards each path to Auth, Business, or Transaction Service through Eureka.
 const removeTrailingSlash = (url) => url?.replace(/\/+$/, "");
 
-export const AUTH_API_URL = removeTrailingSlash(
-  import.meta.env.VITE_AUTH_API_URL
+export const API_GATEWAY_URL = removeTrailingSlash(
+  import.meta.env.VITE_API_GATEWAY_URL
 );
 
-export const BUSINESS_API_URL = removeTrailingSlash(
-  import.meta.env.VITE_BUSINESS_API_URL
-);
+export const AUTH_API_URL = `${API_GATEWAY_URL}/api/auth`;
+export const BUSINESS_API_URL = `${API_GATEWAY_URL}/api/business`;
+export const TRANSACTION_API_URL = `${API_GATEWAY_URL}/api/transactions`;
