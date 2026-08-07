@@ -5,7 +5,6 @@ const authSlice = createSlice({
   name: "auth",
   initialState:{    
     user: null,  //this will contain id, username and role    
-    token: null,
     isAuthenticated: false,
     // Protected routes must wait until /api/auth/me checks the JWT cookie.
     isInitializing: true,
@@ -13,7 +12,6 @@ const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.user = action.payload.user;
-      state.token = action.payload.token;
       state.isAuthenticated = true;
       state.isInitializing = false;
     },
@@ -22,7 +20,6 @@ const authSlice = createSlice({
       // The HttpOnly cookie contains the JWT, so only safe user details
       // need to be restored in Redux after a browser refresh.
       state.user = action.payload.user;
-      state.token = null;
       state.isAuthenticated = true;
       state.isInitializing = false;
     },
@@ -34,7 +31,6 @@ const authSlice = createSlice({
 
     logout: (state) => {
       state.user = null;
-      state.token = null;
       state.isAuthenticated = false;
       state.isInitializing = false;
     },

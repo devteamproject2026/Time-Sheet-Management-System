@@ -5,9 +5,12 @@ Assignment APIs.
 
 ## Service addresses
 
-- Auth Service: `http://localhost:8081`
-- Business Service: `http://localhost:8082`
-- Business base URL: `http://localhost:8082/api/business`
+- API Gateway: `http://localhost:8080`
+- Auth base URL through Gateway: `http://localhost:8080/api/auth`
+- Business base URL through Gateway: `http://localhost:8080/api/business`
+
+Do not call the internal Auth (`8081`) or Business (`8082`) ports from the
+frontend or Postman. API Gateway discovers the target service through Eureka.
 
 The user first logs in through Auth Service. Auth Service stores the JWT in an
 HttpOnly cookie named `jwt`. Postman or React must send that cookie with later

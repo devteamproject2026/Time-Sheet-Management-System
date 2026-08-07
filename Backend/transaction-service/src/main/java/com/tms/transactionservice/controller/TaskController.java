@@ -7,8 +7,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import com.tms.transactionservice.dto.CreateTaskRequest;
+import com.tms.transactionservice.dto.UpdateTaskRequest;
 import com.tms.transactionservice.dto.UpdateTaskProgressRequest;
-import com.tms.transactionservice.entity.Task;
+import com.tms.transactionservice.dto.response.TaskResponse;
 import com.tms.transactionservice.service.TaskService;
 
 /** APIs for the tasks table: assignment, acceptance, and employee progress. */
@@ -20,7 +21,7 @@ public class TaskController {
 
     @PostMapping 
     @PreAuthorize("hasRole('MANAGER')")
-    ResponseEntity<Task> create(Authentication authentication, @Valid @RequestBody CreateTaskRequest request) {
+    public ResponseEntity<TaskResponse> create(Authentication authentication, @Valid @RequestBody CreateTaskRequest request) {
     	
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createTask(authentication.getName(), request));
         
@@ -28,7 +29,7 @@ public class TaskController {
 
     @GetMapping("/my") 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    List<Task> myTasks(Authentication authentication) { 
+    public List<TaskResponse> myTasks(Authentication authentication) {
     	
     	return service.myTasks(authentication.getName()); 
     	
@@ -36,22 +37,32 @@ public class TaskController {
 
     @GetMapping("/managed") 
     @PreAuthorize("hasRole('MANAGER')")
-    List<Task> managedTasks(Authentication authentication) { 
+    public List<TaskResponse> managedTasks(Authentication authentication) {
     	
     	return service.myManagedTasks(authentication.getName()); 
     }
 
     @PutMapping("/{taskId}/accept") 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    Task accept(Authentication authentication, @PathVariable Integer taskId) { 
+    public TaskResponse accept(Authentication authentication, @PathVariable Integer taskId) {
     	
     	return service.acceptTask(authentication.getName(), taskId); 
     	}
 
     @PutMapping("/{taskId}/progress") 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    Task updateProgress(Authentication authentication, @PathVariable Integer taskId, @Valid @RequestBody UpdateTaskProgressRequest request) {
+    public TaskResponse updateProgress(Authentication authentication, @PathVariable Integer taskId, @Valid @RequestBody UpdateTaskProgressRequest request) {
        
     	return service.updateProgress(authentication.getName(), taskId, request);
+    }
+
+    /** Owning Managers may update editable details while a Task is unfinished. */
+    @PutMapping("/{taskId}")
+    @PreAuthorize("hasRole('MANAGER')")
+    public TaskResponse update(
+            Authentication authentication,
+            @PathVariable Integer taskId,
+            @Valid @RequestBody UpdateTaskRequest request) {
+        return service.updateTask(authentication.getName(), taskId, request);
     }
 }

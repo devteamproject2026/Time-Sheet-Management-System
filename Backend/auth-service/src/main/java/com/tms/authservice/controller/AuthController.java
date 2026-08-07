@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +20,7 @@ import com.tms.authservice.entity.enums.AccountStatus;
 import com.tms.authservice.entity.enums.ApprovalStatus;
 import com.tms.authservice.entity.enums.Role;
 import com.tms.authservice.service.AuthService;
+import com.tms.authservice.service.AuthenticatedLogin;
 
 import jakarta.validation.Valid;
 
@@ -33,6 +35,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AuthController {
 
     private final AuthService authService;
+
+    @Value("${app.cookie.secure:false}")
+    private boolean secureCookie;
 
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -93,19 +98,20 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
 
-        LoginResponse loginResponse = authService.login(request);
+        AuthenticatedLogin authenticatedLogin = authService.login(request);
 
-        Cookie cookie = new Cookie("jwt", loginResponse.getToken());
+        Cookie cookie = new Cookie("jwt", authenticatedLogin.token());
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);          // true in production
+        cookie.setSecure(secureCookie);
         cookie.setPath("/");
         cookie.setMaxAge(24 * 60 * 60);
+        cookie.setAttribute("SameSite", "Lax");
 
         response.addCookie(cookie);
 
-        //loginResponse.setToken(null);
-
-        return ResponseEntity.ok(loginResponse);
+        // Only safe user information is returned. The JWT is never readable by
+        // React because it exists only in the HttpOnly cookie.
+        return ResponseEntity.ok(authenticatedLogin.response());
     }
 
     //==============================================
@@ -161,8 +167,10 @@ public class AuthController {
 
         Cookie cookie = new Cookie("jwt", null);
         cookie.setHttpOnly(true);
+        cookie.setSecure(secureCookie);
         cookie.setPath("/");
         cookie.setMaxAge(0);
+        cookie.setAttribute("SameSite", "Lax");
 
         response.addCookie(cookie);
 

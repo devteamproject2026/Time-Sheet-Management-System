@@ -33,6 +33,13 @@ import AssignmentsPage from "./components/Business/AssignmentsPage";
 import ManagerTeamPage from "./components/Business/ManagerTeamPage";
 import BusinessDashboard from "./components/Business/BusinessDashboard";
 
+// Transaction Service Pages
+import TasksPage from "./components/Transaction/TasksPage";
+import TimesheetsPage from "./components/Transaction/TimesheetsPage";
+import AttendancePage from "./components/Transaction/AttendancePage";
+import ComplaintsPage from "./components/Transaction/ComplaintsPage";
+import ReportsPage from "./components/Transaction/ReportsPage";
+
 // import ProtectedRoute from "./components/ProtectedRoute";
 
 // import AdminDashboard from "./components/Admin/AdminDashboard";
@@ -212,18 +219,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/hr/timesheets"
-            element={
-              <ProtectedRoute role="HR_HEAD">
-                <ModulePlaceholder
-                  title="Timesheets"
-                  description="This page depends on the future Transaction Service timesheet module."
-                />
-              </ProtectedRoute>
-            }
-          />
-
           {/* Manager Routes */}
           <Route
             path="/manager"
@@ -245,10 +240,7 @@ function App() {
             path="/manager/tasks"
             element={
               <ProtectedRoute role="MANAGER">
-                <ModulePlaceholder
-                  title="Task Management"
-                  description="This page depends on the future Transaction Service task module."
-                />
+                <TasksPage />
               </ProtectedRoute>
             }
           />
@@ -264,10 +256,31 @@ function App() {
             path="/manager/timesheets"
             element={
               <ProtectedRoute role="MANAGER">
-                <ModulePlaceholder
-                  title="Team Timesheets"
-                  description="This page depends on the future Transaction Service approval workflow."
-                />
+                <TimesheetsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/attendance"
+            element={
+              <ProtectedRoute role="MANAGER">
+                <AttendancePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/complaints"
+            element={
+              <ProtectedRoute role="MANAGER">
+                <ComplaintsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/reports"
+            element={
+              <ProtectedRoute role="MANAGER">
+                <ReportsPage />
               </ProtectedRoute>
             }
           />
@@ -293,10 +306,7 @@ function App() {
             path="/employee/tasks"
             element={
               <ProtectedRoute role="EMPLOYEE">
-                <ModulePlaceholder
-                  title="My Tasks"
-                  description="This page depends on the future Transaction Service task module."
-                />
+                <TasksPage />
               </ProtectedRoute>
             }
           />
@@ -304,10 +314,23 @@ function App() {
             path="/employee/timesheets"
             element={
               <ProtectedRoute role="EMPLOYEE">
-                <ModulePlaceholder
-                  title="My Timesheets"
-                  description="This page depends on the future Transaction Service timesheet module."
-                />
+                <TimesheetsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/attendance"
+            element={
+              <ProtectedRoute role="EMPLOYEE">
+                <AttendancePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/complaints"
+            element={
+              <ProtectedRoute role="EMPLOYEE">
+                <ComplaintsPage />
               </ProtectedRoute>
             }
           />

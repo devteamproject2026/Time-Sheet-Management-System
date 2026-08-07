@@ -5,7 +5,6 @@ import java.util.List;
 import com.tms.authservice.dto.ChangePasswordRequest;
 import com.tms.authservice.dto.CurrentUserResponse;
 import com.tms.authservice.dto.LoginRequest;
-import com.tms.authservice.dto.LoginResponse;
 import com.tms.authservice.dto.RegisterHrRequest;
 import com.tms.authservice.dto.UserLookupResponse;
 import com.tms.authservice.entity.User;
@@ -22,7 +21,7 @@ public interface AuthService {
                         AccountStatus accountStatus);
 
     // Login
-    LoginResponse login(LoginRequest request);
+    AuthenticatedLogin login(LoginRequest request);
 
     // Restore the currently authenticated user's safe profile after a page refresh
     CurrentUserResponse getCurrentUser(String username);

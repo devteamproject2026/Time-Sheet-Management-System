@@ -47,7 +47,6 @@ export default function LoginComp() {
             username: data.username,
             role: data.role,
           },
-          token: data.token,
         })
       );
 

@@ -80,7 +80,7 @@ this.jwtService = jwtService;
     //                LOGIN
     //=============================================
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public AuthenticatedLogin login(LoginRequest request) {
 
         User user = userRepository
                 .findByUsernameAndApprovalStatusAndAccountStatus(
@@ -97,13 +97,15 @@ this.jwtService = jwtService;
         // Generate JWT Token
         String token = jwtService.generateToken(user);
 
-        return LoginResponse.builder()
+        LoginResponse response = LoginResponse.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .role(user.getRole().name())
-                .token(token)
                 .message("Login Successful")
                 .build();
+
+        // The controller places the token only in an HttpOnly cookie.
+        return new AuthenticatedLogin(response, token);
     }
 
     //=============================================
