@@ -1,5 +1,6 @@
 import {
   AUTH_API_URL,
+  AI_API_URL,
   BUSINESS_API_URL,
   TRANSACTION_API_URL,
 } from "../config/api";
@@ -45,3 +46,6 @@ export const authApi = (path, options) =>
 // Transaction Service uses the same HttpOnly JWT cookie as the other services.
 export const transactionApi = (path, options) =>
   request(TRANSACTION_API_URL, path, options);
+
+// Employee AI requests also pass through Gateway and use the HttpOnly cookie.
+export const aiApi = (path, options) => request(AI_API_URL, path, options);

@@ -39,6 +39,7 @@ import TimesheetsPage from "./components/Transaction/TimesheetsPage";
 import AttendancePage from "./components/Transaction/AttendancePage";
 import ComplaintsPage from "./components/Transaction/ComplaintsPage";
 import ReportsPage from "./components/Transaction/ReportsPage";
+import EmployeeAssistantPage from "./components/AI/EmployeeAssistantPage";
 
 // import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -331,6 +332,14 @@ function App() {
             element={
               <ProtectedRoute role="EMPLOYEE">
                 <ComplaintsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/assistant"
+            element={
+              <ProtectedRoute role="EMPLOYEE">
+                <EmployeeAssistantPage />
               </ProtectedRoute>
             }
           />
