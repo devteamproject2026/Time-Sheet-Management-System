@@ -53,6 +53,7 @@ export default function Sidebar() {
           { label: "My Timesheets", path: "/timesheets", icon: "clock" },
           { label: "Attendance", path: "/attendance", icon: "calendar-check" },
           { label: "Complaints", path: "/complaints", icon: "chat-left-text" },
+          { label: "AI Assistant", path: "/assistant", icon: "robot" },
         ];
 
       default:

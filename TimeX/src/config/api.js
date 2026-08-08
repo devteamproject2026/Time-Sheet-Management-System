@@ -9,3 +9,4 @@ export const API_GATEWAY_URL = removeTrailingSlash(
 export const AUTH_API_URL = `${API_GATEWAY_URL}/api/auth`;
 export const BUSINESS_API_URL = `${API_GATEWAY_URL}/api/business`;
 export const TRANSACTION_API_URL = `${API_GATEWAY_URL}/api/transactions`;
+export const AI_API_URL = `${API_GATEWAY_URL}/api/ai`;

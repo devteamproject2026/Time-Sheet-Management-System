@@ -13,11 +13,11 @@ for each role. Roles decide **who can use an operation**, while modules define
 
 | Area | Status | Included features |
 |---|---|---|
-| React frontend | Auth, Business and Transaction modules implemented | Protected role dashboards, Client/Project management, Tasks, Timesheets, Attendance, Complaints and Manager reports |
+| React frontend | Auth, Business, Transaction and Employee AI modules implemented | Protected role dashboards, Client/Project management, Tasks, Timesheets, Attendance, Complaints, reports and Employee task chat |
 | Auth Service | Implemented | Registration, approval, login, logout, BCrypt passwords, JWT cookie, role security, active user lookups |
 | Business Service | Implemented | Client CRUD, Project CRUD, Manager/Employee scoped Project views, Employee-Project assignments, validation and API errors |
 | Transaction Service | Implemented | Tasks, attendance, timesheets, approvals, complaints and Manager reports |
-| GenAI Assistant | Planned | Role-aware help, navigation guidance, FAQs and timesheet assistance |
+| AI Assistant Service | Implemented | Employee-only Gemini chat grounded in the logged-in Employee's Task records |
 
 > Employee-to-Project assignment belongs to **Business Service**, because it
 > defines the company’s work structure. Transaction Service will record daily
@@ -34,7 +34,7 @@ where:
 - Managers see only Projects and teams that they manage.
 - Employees see only Projects assigned to them.
 - Transaction Service records daily work, approvals, attendance and complaints.
-- A future GenAI assistant will help users understand and use the application.
+- Employees can ask the AI assistant about their own current, pending and completed Tasks.
 
 ## Architecture
 
@@ -46,28 +46,29 @@ flowchart LR
     AUTH["Auth Service<br/>Port 8081"]
     BUSINESS["Business Service<br/>Port 8082"]
     TX["Transaction Service<br/>Port 8083"]
-    AI["GenAI Assistant<br/>Planned"]
+    AI["AI Assistant Service<br/>Port 8084"]
     DB[("MySQL<br/>TimeSheetDB")]
 
     UI -->|"All /api/** requests + JWT cookie"| GATEWAY
     GATEWAY -->|"/api/auth/**"| AUTH
     GATEWAY -->|"/api/business/**"| BUSINESS
     GATEWAY -->|"/api/transactions/**"| TX
-    GATEWAY -.->|"Future /api/assistant/**"| AI
+    GATEWAY -->|"/api/ai/**"| AI
     GATEWAY -->|"Discover service instances"| EUREKA
     AUTH -->|"Register"| EUREKA
     BUSINESS -->|"Register"| EUREKA
     TX -->|"Register"| EUREKA
+    AI -->|"Register"| EUREKA
     AUTH --> DB
     BUSINESS --> DB
     TX --> DB
-    AI -.->|"Approved application context"| AUTH
-    AI -.->|"Approved application context"| BUSINESS
+    AI -->|"Authenticated Employee task lookup"| TX
+    AI -->|"Minimal task context"| GEMINI["Gemini API"]
 ```
 
 The frontend calls only API Gateway. Gateway owns the browser CORS policy,
 rejects missing, modified, or expired JWT cookies, and uses Eureka to discover
-healthy Auth, Business, and Transaction Service instances. Individual services
+healthy Auth, Business, Transaction, and AI Assistant Service instances. Individual services
 validate the JWT again and enforce role and record-level authorization. This is
 defence in depth: the Gateway protects the common entrance, while each service
 still protects itself.
@@ -224,27 +225,23 @@ See [the complete Transaction API guide](Backend/transaction-service/TRANSACTION
 for all 21 endpoints, request bodies, permissions, workflows and Postman
 examples.
 
-### GenAI Assistant — planned
+### AI Assistant Service
 
-The planned assistant will provide an in-application chat experience. Example
-questions include:
+Location: `Backend/work-plus-ai-service`
 
-- “How do I submit a timesheet?”
-- “Which Projects am I assigned to?”
-- “Why was my request rejected?”
-- “Where can HR create a new Manager?”
-- “Explain the approval workflow.”
+The Employee-only assistant accepts `POST /api/ai/chat`. It validates the same
+JWT cookie, retrieves `/api/transactions/tasks/my` through Eureka, and sends
+only those task fields with the Employee's question to Gemini. It does not have
+database credentials and cannot read another Employee's records.
 
-Design principles:
+Example questions:
 
-- The assistant must use the authenticated user’s role.
-- It must not expose another user’s private data.
-- It should use approved application documentation and authorized API data.
-- It should not directly modify database records without an explicit,
-  authorized application action.
-- API keys must be stored in environment variables, never committed to Git.
-- Answers that affect attendance, approval, or policy should link users to the
-  official application workflow.
+- "What tasks are currently pending?"
+- "Show my completed tasks."
+- "Which task should I work on now?"
+
+The Gemini key is read from `GEMINI_API_KEY` and must never be stored in React,
+`application.properties`, Git history, screenshots, or documentation.
 
 ## Technology stack
 
@@ -253,6 +250,7 @@ Design principles:
 | Frontend | React 19, Vite 8, React Router, Redux Toolkit, Bootstrap, CSS |
 | Backend | Java 21, Spring Boot, Spring Web/MVC, Spring Data JPA, Spring Security, Jakarta Validation |
 | Microservices | Spring Cloud Gateway, Netflix Eureka service discovery and load-balanced routing |
+| AI | Gemini API grounded with authenticated Employee Task data |
 | Authentication | JWT (JJWT), HttpOnly cookies, BCrypt |
 | Database | MySQL 8, Hibernate/JPA |
 | Build tools | Maven Wrapper, npm |
@@ -268,6 +266,8 @@ WorkPlus1/
 │   │   └── BUSINESS_SERVICE_API.md
 │   ├── transaction-service/       # Tasks, timesheets and daily workflows
 │   │   └── TRANSACTION_SERVICE_API.md
+│   ├── work-plus-ai-service/       # Employee Task assistant using Gemini
+│   │   └── AI_SERVICE_API.md
 │   ├── work-plus-api-gateway/     # Public API routes and centralized CORS
 │   └── work-plus-discovery-server/# Eureka service registry
 ├── Database/
@@ -365,6 +365,7 @@ Password: root
 Auth port: 8081
 Business port: 8082
 Transaction port: 8083
+AI Assistant port: 8084
 API Gateway port: 8080
 Eureka port: 8761
 ```
@@ -378,7 +379,7 @@ $env:DB_PASSWORD="your_mysql_password"
 $env:JWT_SECRET="your_base64_encoded_secret_of_at_least_32_bytes"
 ```
 
-Auth, Gateway, Business, and Transaction services must use the exact same
+Auth, Gateway, Business, Transaction, and AI Assistant services must use the exact same
 `JWT_SECRET`.
 
 Supported variables:
@@ -388,12 +389,15 @@ Supported variables:
 | `DB_URL` | MySQL JDBC URL |
 | `DB_USERNAME` | MySQL username |
 | `DB_PASSWORD` | MySQL password |
-| `JWT_SECRET` | Shared JWT signing/verification secret for Auth, Gateway, Business, and Transaction |
+| `JWT_SECRET` | Shared JWT signing/verification secret for Auth, Gateway, Business, Transaction, and AI Assistant |
 | `JWT_EXPIRATION_MS` | JWT lifetime; local default is 24 hours |
 | `COOKIE_SECURE` | Set `true` when HTTPS is enabled so the JWT cookie is HTTPS-only |
 | `AUTH_SERVICE_PORT` | Auth Service port |
 | `BUSINESS_SERVICE_PORT` | Business Service port |
 | `TRANSACTION_SERVICE_PORT` | Transaction Service port; default `8083` |
+| `AI_SERVICE_PORT` | AI Service port; default `8084` |
+| `GEMINI_API_KEY` | Server-only Gemini credential; no default value |
+| `GEMINI_MODEL` | Gemini model; default `gemini-3.5-flash` |
 | `API_GATEWAY_PORT` | Public API Gateway port; default `8080` |
 | `DISCOVERY_SERVER_PORT` | Eureka server port; default `8761` |
 | `EUREKA_DEFAULT_ZONE` | Eureka registration URL |
@@ -462,7 +466,18 @@ Expected address:
 http://localhost:8083
 ```
 
-### 8. Start API Gateway
+### 8. Start AI Assistant Service
+
+Set `GEMINI_API_KEY` in the STS Run Configuration environment and run
+`AiAssistantServiceApplication` as a Spring Boot App.
+
+Expected address:
+
+```text
+http://localhost:8084
+```
+
+### 9. Start API Gateway
 
 ```powershell
 cd Backend/work-plus-api-gateway
@@ -472,7 +487,7 @@ cd Backend/work-plus-api-gateway
 The browser and Postman use `http://localhost:8080`. Service ports remain
 internal development addresses and should not be called by the frontend.
 
-### 9. Start the React frontend
+### 10. Start the React frontend
 
 Open another terminal:
 
@@ -497,8 +512,9 @@ http://localhost:5173
 3. Auth Service (8081)
 4. Business Service (8082)
 5. Transaction Service (8083)
-6. API Gateway (8080)
-7. React frontend (5173)
+6. AI Assistant Service (8084)
+7. API Gateway (8080)
+8. React frontend (5173)
 ```
 
 ## First-use workflow
@@ -511,6 +527,7 @@ http://localhost:5173
 6. HR assigns Employees to Projects.
 7. Managers create Tasks; Employees accept them and record progress.
 8. Employees submit Timesheets and Managers review them.
+9. Employees ask the AI Assistant about their own Task status and progress.
 
 For a completely fresh database, an initial Admin account must be securely
 bootstrapped with a BCrypt password before step 2. A safe automated Admin seed
@@ -575,10 +592,21 @@ cd ../work-plus-discovery-server
 .\mvnw.cmd test
 ```
 
+AI Assistant Service (a Maven installation or STS Maven runner is required):
+
+```powershell
+cd Backend/work-plus-ai-service
+mvn test
+```
+
+Before starting AI Assistant Service, set a Gemini key in its STS Run
+Configuration under **Environment** as `GEMINI_API_KEY`. Never add the real
+key to `application.properties`, React, screenshots, commits, or documentation.
+
 ## Roadmap
 
 - Add end-to-end browser tests for Transaction Service workflows.
-- Add the role-aware GenAI assistant.
+- Extend the Employee AI Assistant to other approved WorkPlus data sources.
 - Add automated Admin bootstrap for fresh environments.
 - Replace development defaults with deployment secrets.
 - Add automated integration/security tests.
@@ -618,6 +646,7 @@ permissions, database effects, and service boundaries before merging.
 
 - [Business Service API Guide](Backend/buisness-service/BUSINESS_SERVICE_API.md)
 - [Transaction Service API Guide](Backend/transaction-service/TRANSACTION_SERVICE_API.md)
+- [AI Assistant API Guide](Backend/work-plus-ai-service/AI_SERVICE_API.md)
 - [Database schema](Database/P26-Createdb.sql)
 - [Development sample data](Database/P26-Populatedb.sql)
 
