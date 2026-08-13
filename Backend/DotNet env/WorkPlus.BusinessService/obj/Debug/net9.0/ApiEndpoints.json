@@ -1,0 +1,264 @@
+[
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ClientController",
+    "Method": "CreateClient",
+    "RelativePath": "api/business/clients",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "WorkPlus.BusinessService.DTOs.ClientRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ClientController",
+    "Method": "GetAllClients",
+    "RelativePath": "api/business/clients",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ClientController",
+    "Method": "GetClientById",
+    "RelativePath": "api/business/clients/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ClientController",
+    "Method": "UpdateClient",
+    "RelativePath": "api/business/clients/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "WorkPlus.BusinessService.DTOs.ClientRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ClientController",
+    "Method": "DeleteClient",
+    "RelativePath": "api/business/clients/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.EmployeeProjectController",
+    "Method": "AssignEmployeeToProject",
+    "RelativePath": "api/business/employee-projects",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "WorkPlus.BusinessService.DTOs.EmployeeProjectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.EmployeeProjectController",
+    "Method": "GetAllAssignments",
+    "RelativePath": "api/business/employee-projects",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.EmployeeProjectController",
+    "Method": "RemoveAssignment",
+    "RelativePath": "api/business/employee-projects/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.EmployeeProjectController",
+    "Method": "GetAssignmentsForEmployee",
+    "RelativePath": "api/business/employee-projects/employee/{employeeId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "employeeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.EmployeeProjectController",
+    "Method": "GetMyAssignments",
+    "RelativePath": "api/business/employee-projects/my-projects",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.EmployeeProjectController",
+    "Method": "GetAssignmentsForProject",
+    "RelativePath": "api/business/employee-projects/project/{projectId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "projectId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ProjectController",
+    "Method": "CreateProject",
+    "RelativePath": "api/business/projects",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "WorkPlus.BusinessService.DTOs.ProjectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ProjectController",
+    "Method": "GetAllProjects",
+    "RelativePath": "api/business/projects",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ProjectController",
+    "Method": "GetProjectById",
+    "RelativePath": "api/business/projects/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ProjectController",
+    "Method": "UpdateProject",
+    "RelativePath": "api/business/projects/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "WorkPlus.BusinessService.DTOs.ProjectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ProjectController",
+    "Method": "DeleteProject",
+    "RelativePath": "api/business/projects/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ProjectController",
+    "Method": "GetMyAssignedProjects",
+    "RelativePath": "api/business/projects/my-assigned-projects",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkPlus.BusinessService.Controllers.ProjectController",
+    "Method": "GetMyManagedProjects",
+    "RelativePath": "api/business/projects/my-managed-projects",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
