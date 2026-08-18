@@ -1,0 +1,6 @@
+@WorkPlus.ApiGateway_HostAddress = http://localhost:5212
+
+GET {{WorkPlus.ApiGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
