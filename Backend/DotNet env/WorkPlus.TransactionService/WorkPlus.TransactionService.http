@@ -1,0 +1,6 @@
+@WorkPlus.TransactionService_HostAddress = http://localhost:5195
+
+GET {{WorkPlus.TransactionService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
